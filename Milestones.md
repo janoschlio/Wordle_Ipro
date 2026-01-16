@@ -1,83 +1,89 @@
-# Meilensteine – Wordle Projekt Janosch Lio
+# Projekt-Milestones
 
-Dieses Dokument beschreibt die Meilensteine für das Projekt **Wordle**.
-
----
-
-## M1 – Vorbereitung
-
-**Inhalt:**
-- Projektidee festhalten
-- Erste Skizze der Benutzeroberfläche
-- Grobe Ziele definieren
-- Repository erstellen
-
-**Ergebnis:**
-- Projektidee
-- Skizze
-- Repository
+Dieses Dokument beschreibt die Milestones (GitHub Milestones) für das Repo.
 
 ---
 
-## M2 – Analyse
+## Milestone 1 — Projekt-Setup & Tech-Stack festlegen
+**Ziel:** Basis schaffen, damit Entwicklung sauber starten kann.
 
-**Inhalt:**
-- Projektumfang definieren
-- Anforderungen und gewünschte Funktionen festlegen (**Feature erstellen**)
-- Dokumentation starten
+**Inhalte / Tasks**
+- Programmiersprachen festlegen
+- Technologien/Frameworks festlegen (Front + Backend)
+- Front-end Skizze/Wireframe erstellen
+- Git-Repo aufsetzen (Basics: Branching, .gitignore, ggf. README)
 
-**Ergebnis:**
-- Feature-Liste
-- Dokumentation v1
-
----
-
-## M3 – Planung & Setup
-
-**Inhalt:**
-- Technologien festlegen
-- Grobes Architekturkonzept erstellen
-- Entwicklungsumgebung einrichten
-- Testansatz überlegen
-
-**Ergebnis:**
-- Technisches Grundkonzept
-- Lauffähige Entwicklungsumgebung
-- Testkonzept
+**Done, wenn**
+- Tech-Stack dokumentiert ist
+- Repo steht und ein erster Struktur-Commit vorhanden ist
+- Mockup erstellt ist
 
 ---
 
-## M4 – Umsetzung
+## Milestone 2 — Funktionalitäten definieren
+**Ziel:** Klarheit, was gebaut wird und wie es funktioniert.
 
-**Inhalt:**
-- Funktionen schrittweise implementieren (**Features umsetzen**)
-- Tests durchführen
-- Feedback von externer Person einholen und einarbeiten
-- Laufend dokumentieren
+**Inhalte / Tasks**
+- Features
+- Spielregeln/Regeln des Systems definieren
 
-**Ergebnis:**
-- Funktionierende und getestete Webapplikation
-- Aussagekräftige Dokumentation
-
----
-
-## M5 – Abschluss
-
-**Inhalt:**
-- Dokumentation abschliessen
-- Präsentation vorbereiten
-
-**Ergebnis:**
-- Präsentation
-- Abschlussdokumentation
+**Done, wenn**
+- Feature-Liste vorliegt
+- Spielregeln schriftlich festgehalten sind
 
 ---
 
-## M6 – Abgabe
+## Milestone 3 — MVP: Basic UI + Doku + Testing
+**Ziel:** Erste lauffähige Version mit Grund-UI und minimalem Qualitätsrahmen.
 
-**Inhalt:**
-- Finalen Stand abgeben (**08.09.2026**)
-- Projekt vorstellen
+**Inhalte / Tasks**
+- Basic UI umsetzen (MVP)
+- README / Doku anlegen (Setup, Run, Struktur)
 
-**Ergebnis:**
-- Abgegebenes Projekt
+**Done, wenn**
+- App startet lokal reproduzierbar
+- Basis-UI bedienbar ist
+
+---
+
+## Milestone 4 — Workflow implementieren (Kernfunktionalität)
+**Ziel:** Der Hauptablauf funktioniert end-to-end.
+
+**Inhalte / Tasks**
+- Workflow programmieren
+- Funktionalitäten implementieren (gemäß Milestone 2)
+- Doku erweitern (z. B. Spielregeln, Abläufe, wichtige Entscheidungen)
+
+**Done, wenn**
+- Kernablauf vollständig nutzbar ist
+- Zentrale Features funktionieren und sind dokumentiert
+
+---
+
+## Milestone 5 — Statistik + Datenbank
+**Ziel:** Persistenz + Auswertung.
+
+**Inhalte / Tasks**
+- Statistik-Feature einbauen
+- Datenbank erstellen & anbinden
+- Doku (DB-Modell, Migrationen, Konfiguration) ergänzen
+
+**Done, wenn**
+- Daten persistent gespeichert werden
+- Statistik nachvollziehbar funktioniert
+- DB-Setup für neue Entwickler:innen klar dokumentiert ist
+
+---
+
+## Milestone 6 — Deployment & Präsentation
+**Ziel:** Ergebnis “vorzeigbar” machen.
+
+**Inhalte / Tasks**
+- Deployment durchführen (Umgebung/Hosting festlegen)
+- Resultat präsentieren (Demo-Flow, Screenshots, ggf. Release Notes)
+
+**Done, wenn**
+- Eine deployte Version erreichbar ist (oder reproduzierbarer Release-Prozess existiert)
+- Demo/Präsentationsmaterial bereitsteht
+
+---
