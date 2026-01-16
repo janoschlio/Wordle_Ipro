@@ -10,8 +10,6 @@ Dieses Projekt ist eine Implementierung des beliebten Wortspiels Wordle als Web-
 
 Das Projekt folgt einem strukturierten Entwicklungsplan mit 6 Milestones:
 
-### ✅ Milestone 1 — Projekt-Setup & Tech-Stack
-- **Status:** Abgeschlossen
 ## 🛠️ Tech-Stack
 
 - **Framework:** Blazor Server (.NET 10.0)
@@ -22,39 +20,6 @@ Das Projekt folgt einem strukturierten Entwicklungsplan mit 6 Milestones:
 - **Datenbank:** MS SQL Server (Docker Container)
 - **Deployment:** Linux Server
 - **Containerisierung:** Docker & Docker Compose
-
-### 🔄 Milestone 2 — Funktionalitäten definieren
-- **Status:** In Planung
-- **Ziele:**
-  - Feature-Liste erstellen und priorisieren
-  - Spielregeln definieren
-  - Wortlänge, Anzahl Versuche, Bewertungslogik festlegen
-
-### 📝 Milestone 3 — MVP: Basic UI + Doku + Testing
-- **Ziele:**
-  - Grundlegende Benutzeroberfläche implementieren
-  - Spielfeld mit Eingabemöglichkeiten
-  - Erste Tests einrichten
-  - Setup-Dokumentation erweitern
-
-### ⚙️ Milestone 4 — Workflow implementieren
-- **Ziele:**
-  - Kernspiellogik implementieren
-  - Worteingabe und -validierung
-  - Feedback-System (grün/gelb/grau)
-  - Win/Loss-Bedingungen
-
-### 📊 Milestone 5 — Statistik + Datenbank
-- **Ziele:**
-  - Spielstatistiken erfassen (Siege, Versuche, Streak)
-  - Datenbank-Integration
-  - Persistierung von Spielergebnissen
-
-### 🚀 Milestone 6 — Deployment & Präsentation
-- **Ziele:**
-  - Deployment-Strategie festlegen
-  - Anwendung deployen
-  - Demo-Material erstellen
 
 ## 🛠️ Setup & Installation
 
