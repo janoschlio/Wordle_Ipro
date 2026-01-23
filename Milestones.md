@@ -4,7 +4,7 @@ Dieses Dokument beschreibt die Milestones (GitHub Milestones) für das Repo.
 
 ---
 
-## Milestone 1 — Projekt-Setup & Tech-Stack festlegen
+## Milestone 1 — Projekt-Setup & Tech-Stack festlegen (16.01.2026)
 **Ziel:** Basis schaffen, damit Entwicklung sauber starten kann.
 
 **Inhalte / Tasks**
@@ -20,7 +20,7 @@ Dieses Dokument beschreibt die Milestones (GitHub Milestones) für das Repo.
 
 ---
 
-## Milestone 2 — Funktionalitäten definieren
+## Milestone 2 — Funktionalitäten definieren (25.01.2026)
 **Ziel:** Klarheit, was gebaut wird und wie es funktioniert.
 
 **Inhalte / Tasks**
@@ -33,7 +33,7 @@ Dieses Dokument beschreibt die Milestones (GitHub Milestones) für das Repo.
 
 ---
 
-## Milestone 3 — MVP: Basic UI + Doku + Testing
+## Milestone 3 — MVP: Basic UI + Doku + Testing (25.01.2026)
 **Ziel:** Erste lauffähige Version mit Grund-UI und minimalem Qualitätsrahmen.
 
 **Inhalte / Tasks**
@@ -46,7 +46,7 @@ Dieses Dokument beschreibt die Milestones (GitHub Milestones) für das Repo.
 
 ---
 
-## Milestone 4 — Workflow implementieren (Kernfunktionalität)
+## Milestone 4 — Workflow implementieren (Kernfunktionalität) (25.01.2026)
 **Ziel:** Der Hauptablauf funktioniert end-to-end.
 
 **Inhalte / Tasks**
@@ -60,7 +60,7 @@ Dieses Dokument beschreibt die Milestones (GitHub Milestones) für das Repo.
 
 ---
 
-## Milestone 5 — Statistik + Datenbank
+## Milestone 5 — Statistik + Datenbank (01.02.2026)
 **Ziel:** Persistenz + Auswertung.
 
 **Inhalte / Tasks**
@@ -75,7 +75,7 @@ Dieses Dokument beschreibt die Milestones (GitHub Milestones) für das Repo.
 
 ---
 
-## Milestone 6 — Deployment & Präsentation
+## Milestone 6 — Deployment & Präsentation (17.08.2026)
 **Ziel:** Ergebnis “vorzeigbar” machen.
 
 **Inhalte / Tasks**
