@@ -1,0 +1,265 @@
+:root{
+    --primary:#13ec5b;
+    --bg-light:#f6f8f6;
+    --bg-dark:#102216;
+
+    --tile-correct:#13ec5b;
+    --tile-present:#eab308;
+    --tile-absent:#3a3a3c;
+    --tile-empty:#1c271f;
+    --tile-border:#3b5443;
+
+    --text-dark:#0f172a;
+    --text-muted:#9db9a6;
+}
+
+.wordle-app{
+    font-family: "Spline Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    height: 100vh;
+    display:flex;
+    background: var(--bg-dark);
+    color: white;
+}
+
+.wordle-aside{
+    width: 16rem;
+    border-right: 1px solid var(--tile-border);
+    padding: 1rem;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    background: var(--bg-dark);
+}
+
+.brand{
+    display:flex; gap:.75rem; align-items:center;
+}
+.brand-badge{
+    width:40px; height:40px; border-radius:9999px;
+    background: var(--primary);
+    display:grid; place-items:center;
+    color: var(--bg-dark);
+}
+.brand-title{ font-weight:800; line-height:1.1; }
+.brand-sub{ color: var(--text-muted); font-size:.8rem; font-weight:600; }
+
+.nav{
+    margin-top: 1.25rem;
+    display:flex; flex-direction:column; gap:.5rem;
+}
+.nav a{
+    text-decoration:none;
+    color: rgba(255,255,255,.8);
+    padding:.75rem 1rem;
+    border-radius:.75rem;
+    display:flex; gap:.75rem; align-items:center;
+}
+.nav a:hover{ background: rgba(255,255,255,.05); }
+.nav a.active{
+    background: rgba(19, 236, 91, 0.15);
+    border-right: 3px solid var(--primary);
+    color: var(--primary);
+}
+
+.wordle-main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    padding: 2rem 1rem 1rem;
+    overflow:auto;
+    position:relative;
+}
+
+.wordle-header{
+    width: 100%;
+    max-width: 42rem;
+    text-align:center;
+    margin-bottom: 1rem;
+}
+.header-inner{
+    display:inline-flex;
+    align-items:center;
+    gap:1rem;
+    padding: 0 2rem .5rem;
+    border-bottom: 1px solid var(--tile-border);
+}
+.wordle-title{
+    letter-spacing:.2em;
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin:0;
+}
+.icon-btn{
+    width:32px; height:32px;
+    display:grid; place-items:center;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,.65);
+    cursor:pointer;
+}
+.icon-btn:hover{
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.board-wrap{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 1rem 0;
+}
+.board{
+    display:grid;
+    grid-template-rows: repeat(6, auto);
+    gap:.5rem;
+}
+.board-row{
+    display:grid;
+    grid-template-columns: repeat(5, auto);
+    gap:.5rem;
+}
+
+.tile{
+    width:56px; height:56px;
+    display:grid;
+    place-items:center;
+    border-radius: .5rem;
+    border: 2px solid var(--tile-border);
+    background: transparent;
+    font-size: 1.5rem;
+    font-weight: 800;
+    user-select:none;
+}
+@media (min-width:768px){
+    .tile{ width:64px; height:64px; }
+}
+
+.tile.empty{ background: transparent; border-color: var(--tile-border); }
+.tile.filled{ background: transparent; border-color: rgba(255,255,255,.4); }
+.tile.correct{ background: var(--tile-correct); border-color: var(--tile-correct); }
+.tile.present{ background: var(--tile-present); border-color: var(--tile-present); }
+.tile.absent{ background: var(--tile-absent); border-color: var(--tile-absent); }
+
+.keyboard{
+    width:100%;
+    max-width: 600px;
+    display:flex;
+    flex-direction:column;
+    gap:.5rem;
+    padding:.5rem;
+    user-select:none;
+}
+.kb-row{
+    display:flex;
+    justify-content:center;
+    gap:.375rem;
+}
+.kb-key{
+    height:56px;
+    flex:1;
+    max-width:50px;
+    border:0;
+    border-radius:.375rem;
+    font-weight:800;
+    text-transform:uppercase;
+    cursor:pointer;
+}
+.kb-key.neutral{ background: rgba(255,255,255,.2); color: white; }
+.kb-key.absent{ background: var(--tile-absent); color:white; }
+.kb-key.present{ background: var(--tile-present); color:white; }
+.kb-key.correct{ background: var(--tile-correct); color:white; }
+
+.kb-key.wide{
+    flex:0 0 auto;
+    min-width: 65px;
+    padding: 0 .75rem;
+    font-size: .75rem;
+    background: rgba(255,255,255,.25);
+}
+
+.legend{
+    margin-top: 1rem;
+    color: rgba(255,255,255,.7);
+    font-size:.9rem;
+    display:flex;
+    gap:1.5rem;
+    padding-bottom: 1rem;
+}
+.legend-item{ display:flex; align-items:center; gap:.5rem; }
+.legend-dot{
+    width:12px; height:12px; border-radius:2px;
+}
+.legend-dot.correct{ background: var(--tile-correct); }
+.legend-dot.present{ background: var(--tile-present); }
+.legend-dot.absent{ background: var(--tile-absent); }
+
+.material-symbols-outlined{
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Icon */
+
+.brand-icon{
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    display:block;
+}
+
+/* GameRulesPopover */
+.help-popover{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* The floating panel */
+.help-popover__panel{
+    position: absolute;
+    top: 44px;
+    right: 0;
+    width: 320px;
+    padding: 12px 12px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--tile-border);
+    background: rgba(16, 34, 22, 0.98);
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    color: rgba(255,255,255,.9);
+    z-index: 50;
+    text-align: left;
+}
+
+.help-popover__panel h3{
+    margin: 0 0 6px 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: white;
+}
+
+.help-popover__panel ul{
+    margin: 0 0 10px 18px;
+    padding: 0;
+}
+
+.help-popover__panel p{
+    margin: 0;
+    color: rgba(255,255,255,.75);
+    font-size: .9rem;
+    line-height: 1.35;
+}
+
+.help-popover__panel .dot{
+    display:inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.help-popover__panel .dot.correct{ background: var(--tile-correct); }
+.help-popover__panel .dot.present{ background: var(--tile-present); }
+.help-popover__panel .dot.absent{ background: var(--tile-absent); }

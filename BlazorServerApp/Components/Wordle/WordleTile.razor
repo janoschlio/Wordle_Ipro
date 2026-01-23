@@ -1,0 +1,22 @@
+@using BlazorServerApp.Models.Wordle
+
+<div class="tile @CssClass">
+    @if (Tile.Letter is char ch)
+    {
+        @ch
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public TileModel Tile { get; set; } = default!;
+
+    private string CssClass => Tile.State switch
+    {
+        TileState.Empty => "empty",
+        TileState.Filled => "filled",
+        TileState.Correct => "correct",
+        TileState.Present => "present",
+        TileState.Absent => "absent",
+        _ => "empty"
+    };
+}

@@ -1,0 +1,17 @@
+@using BlazorServerApp.Models.Wordle
+
+<div class="board">
+    @for (var r = 0; r < Tiles.Length; r++)
+    {
+        <div class="board-row">
+            @for (var c = 0; c < Tiles[r].Length; c++)
+            {
+                <WordleTile Tile="Tiles[r][c]" />
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public TileModel[][] Tiles { get; set; } = default!;
+}

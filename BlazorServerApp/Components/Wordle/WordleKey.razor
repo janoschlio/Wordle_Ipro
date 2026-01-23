@@ -1,0 +1,25 @@
+@using BlazorServerApp.Models.Wordle
+
+<button type="button" class="kb-key @StateClass @(KeyModel.IsWide ? "wide" : "neutral")">
+    @if (!string.IsNullOrWhiteSpace(KeyModel.Icon))
+    {
+        <span class="material-symbols-outlined">@KeyModel.Icon</span>
+    }
+    else
+    {
+        @KeyModel.Label
+    }
+</button>
+
+@code {
+    [Parameter, EditorRequired] public KeyModel? KeyModel { get; set; }
+
+    private string StateClass => KeyModel.State switch
+    {
+        KeyState.Neutral => "neutral",
+        KeyState.Absent => "absent",
+        KeyState.Present => "present",
+        KeyState.Correct => "correct",
+        _ => "neutral"
+    };
+}
