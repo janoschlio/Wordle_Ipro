@@ -8,7 +8,7 @@ Dieses Projekt ist eine Implementierung des beliebten Wortspiels Wordle als Web-
 
 ## 🎯 Projekt-Milestones
 
-Das Projekt folgt einem strukturierten Entwicklungsplan mit 6 Milestones:
+Das Projekt folgt einem strukturierten Entwicklungsplan mit 6 Milestones: [Milestones.md](./milestones.md)
 
 ## 🛠️ Tech-Stack
 
