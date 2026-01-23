@@ -1,6 +1,8 @@
 @using BlazorServerApp.Models.Wordle
 
-<button type="button" class="kb-key @StateClass @(KeyModel.IsWide ? "wide" : "neutral")">
+<button type="button"
+        class="kb-key @StateClass @(KeyModel.IsWide ? "wide" : "neutral")"
+        @onclick="() => OnPressed.InvokeAsync(KeyModel.Label)">
     @if (!string.IsNullOrWhiteSpace(KeyModel.Icon))
     {
         <span class="material-symbols-outlined">@KeyModel.Icon</span>
@@ -12,7 +14,8 @@
 </button>
 
 @code {
-    [Parameter, EditorRequired] public KeyModel? KeyModel { get; set; }
+    [Parameter, EditorRequired] public KeyModel KeyModel { get; set; } = default!;
+    [Parameter] public EventCallback<string> OnPressed { get; set; }
 
     private string StateClass => KeyModel.State switch
     {

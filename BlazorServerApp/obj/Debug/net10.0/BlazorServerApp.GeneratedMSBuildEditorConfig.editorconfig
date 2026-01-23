@@ -50,6 +50,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWQvR2FtZVJ1bGVzUG9wb3Zlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/janoschlio/Documents/Programming/IPRO/Wordle_Ipro/BlazorServerApp/Components/Wordle/LoseModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Xb3JkbGUvTG9zZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/janoschlio/Documents/Programming/IPRO/Wordle_Ipro/BlazorServerApp/Components/Wordle/WinModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Xb3JkbGUvV2luTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/janoschlio/Documents/Programming/IPRO/Wordle_Ipro/BlazorServerApp/Components/Wordle/WordleBoard.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Xb3JkbGUvV29yZGxlQm9hcmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

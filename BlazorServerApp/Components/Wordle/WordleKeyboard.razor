@@ -3,7 +3,7 @@
 <div class="kb-row">
     @foreach (var key in Keys.Where(IsTopRow))
     {
-        <WordleKey KeyModel="key" />
+        <WordleKey KeyModel="key" OnPressed="OnKeyPressed" />
     }
 </div>
 
@@ -11,7 +11,7 @@
     <div style="width:16px; height:56px;"></div>
     @foreach (var key in Keys.Where(IsMiddleRow))
     {
-        <WordleKey KeyModel="key" />
+        <WordleKey KeyModel="key" OnPressed="OnKeyPressed" />
     }
     <div style="width:16px; height:56px;"></div>
 </div>
@@ -19,12 +19,13 @@
 <div class="kb-row">
     @foreach (var key in Keys.Where(IsBottomRow))
     {
-        <WordleKey KeyModel="key" />
+        <WordleKey KeyModel="key" OnPressed="OnKeyPressed" />
     }
 </div>
 
 @code {
-    [Parameter, EditorRequired] public IReadOnlyList<KeyModel> Keys { get; set; } = [];
+    [Parameter, EditorRequired] public IReadOnlyList<KeyModel> Keys { get; set; } = Array.Empty<KeyModel>();
+    [Parameter] public EventCallback<string> OnKeyPressed { get; set; }
 
     private static bool IsTopRow(KeyModel k) => "QWERTYUIOP".Contains(k.Label);
     private static bool IsMiddleRow(KeyModel k) => "ASDFGHJKL".Contains(k.Label);

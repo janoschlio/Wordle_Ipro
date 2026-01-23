@@ -1,127 +1,136 @@
 @using BlazorServerApp.Components.Shared
 @using BlazorServerApp.Models.Wordle
+@using BlazorServerApp.Services.Wordle
+@implements IDisposable
 
-<div class="wordle-app">
-    <aside class="wordle-aside">
-        <div>
-            <div class="brand">
-                <div class="brand-badge">
-                    <img src="GPTWordleIcon.png" alt="Wordle Icon" class="brand-icon" />
+<div tabindex="0" class="key-capture" @onkeydown="HandlePhysicalKeyDown">
+    <div class="wordle-app">
+        <aside class="wordle-aside">
+            <div>
+                <div class="brand">
+                    <div class="brand-badge">
+                        <img src="GPTWordleIcon.png" alt="Wordle Icon" class="brand-icon"/>
+                    </div>
+                    <div>
+                        <div class="brand-title">Wordle Pro</div>
+                        <div class="brand-sub">Infinite Play</div>
+                    </div>
                 </div>
-                <div>
-                    <div class="brand-title">Wordle Pro</div>
-                    <div class="brand-sub">Infinite Play</div>
+
+                <nav class="nav">
+                    <a href="/">
+                        <span class="material-symbols-outlined">videogame_asset</span>
+                        <span>Game</span>
+                    </a>
+
+                    <a href="/statistics">
+                        <span class="material-symbols-outlined">leaderboard</span>
+                        <span>Statistics</span>
+                    </a>
+                </nav>
+            </div>
+            <div></div>
+        </aside>
+
+        <main class="wordle-main">
+            <header class="wordle-header">
+                <div class="header-inner">
+                    <h1 class="wordle-title">WORDLE</h1>
+                    <GameRulesPopover AriaLabel="How to play">
+                        <h3>How to play</h3>
+                        <ul>
+                            <li>Guess the hidden <b>5-letter word</b> in <b>6 tries</b>.</li>
+                            <li>Each guess must be a <b>valid 5-letter word</b>.</li>
+                            <li>Press <b>Enter</b> to submit your guess.</li>
+                            <li>Use <b>Backspace</b> to delete a letter.</li>
+                        </ul>
+
+                        <h3>Tile colors</h3>
+                        <ul>
+                            <li><span class="dot correct"></span> <b>Green</b>: correct letter, correct spot.</li>
+                            <li><span class="dot present"></span> <b>Yellow</b>: correct letter, wrong spot.</li>
+                            <li><span class="dot absent"></span> <b>Gray</b>: not in the word.</li>
+                        </ul>
+
+                        <h3>Repeated letters</h3>
+                        <p>If a letter appears multiple times, tiles are colored based on how many times that letter
+                            occurs in the hidden word.</p>
+                    </GameRulesPopover>
                 </div>
-            </div>
+            </header>
 
-            <nav class="nav">
-                <a href="/">
-                    <span class="material-symbols-outlined">videogame_asset</span>
-                    <span>Game</span>
-                </a>
+            @if (ChildContent is null)
+            {
+                <div class="board-wrap">
+                    <WordleBoard Tiles="Tiles"/>
+                </div>
 
-                <a href="/statistics">
-                    <span class="material-symbols-outlined">leaderboard</span>
-                    <span>Statistics</span>
-                </a>
-            </nav>
-        </div>
-        <div></div>
-    </aside>
+                <div class="keyboard">
+                    <WordleKeyboard Keys="Keys" OnKeyPressed="HandleVirtualKey"/>
+                </div>
 
-    <main class="wordle-main">
-        <header class="wordle-header">
-            <div class="header-inner">
-                <h1 class="wordle-title">WORDLE</h1>
-                <GameRulesPopover AriaLabel="How to play">
-                    <h3>How to play</h3>
-                    <ul>
-                        <li>Guess the hidden <b>5-letter word</b> in <b>6 tries</b>.</li>
-                        <li>Each guess must be a <b>valid 5-letter word</b>.</li>
-                        <li>Press <b>Enter</b> to submit your guess.</li>
-                        <li>Use <b>Backspace</b> to delete a letter.</li>
-                    </ul>
-
-                    <h3>Tile colors</h3>
-                    <ul>
-                        <li><span class="dot correct"></span> <b>Green</b>: correct letter, correct spot.</li>
-                        <li><span class="dot present"></span> <b>Yellow</b>: correct letter, wrong spot.</li>
-                        <li><span class="dot absent"></span> <b>Gray</b>: not in the word.</li>
-                    </ul>
-
-                    <h3>Repeated letters</h3>
-                    <p>If a letter appears multiple times, tiles are colored based on how many times that letter occurs in the hidden word.</p>
-                </GameRulesPopover>
-            </div>
-        </header>
-
-        @if (ChildContent is null)
-        {
-            <div class="board-wrap">
-                <WordleBoard Tiles="Tiles" />
-            </div>
-
-            <div class="keyboard">
-                <WordleKeyboard Keys="Keys" />
-            </div>
-
-            <WordleLegend />
-        }
-        else
-        {
-            @ChildContent
-        }
-    </main>
+                <WordleLegend/>
+            }
+            else
+            {
+                @ChildContent
+            }
+        </main>
+        <WinModal IsOpen="showWin" Word="@TargetWord" OnPlayAgain="ResetGame" />
+        <LoseModal IsOpen="showLose" Word="@TargetWord" OnTryAgain="ResetGame" />
+    </div>
 </div>
 
 @code {
-    // Dummy UI-State – später ersetzt du das durch GameState aus Service/Store.
-    private TileModel[][] Tiles = default!;
-    private IReadOnlyList<KeyModel> Keys = default!;
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Inject] private WordleGameService GameService { get; set; } = default!;
+
+    private TileModel[][] Tiles => GameService.Tiles;
+    private List<KeyModel> Keys => GameService.Keys;
+    private string TargetWord => GameService.TargetWord;
+    private bool showWin => GameService.IsGameWon;
+    private bool showLose => GameService.IsGameLost;
 
     protected override void OnInitialized()
     {
-        if (ChildContent is not null)
-            return;
-
-        Tiles = Enumerable.Range(0, 6)
-            .Select(_ => Enumerable.Range(0, 5).Select(__ => new TileModel()).ToArray())
-            .ToArray();
-
-        SetRow(0, "STARE", new[] { TileState.Correct, TileState.Absent, TileState.Present, TileState.Absent, TileState.Absent });
-        SetRow(1, "SLANG", new[] { TileState.Correct, TileState.Filled, TileState.Filled, TileState.Filled, TileState.Filled });
-
-        Keys = BuildKeyboard();
+        GameService.OnStateChanged += StateHasChanged;
+        ResetGame();
     }
 
-    private void SetRow(int row, string word, TileState[] states)
+    private void ResetGame()
     {
-        for (int i = 0; i < 5; i++)
-        {
-            Tiles[row][i].Letter = word[i];
-            Tiles[row][i].State = states[i];
-        }
+        GameService.ResetGame();
     }
 
-    private static IReadOnlyList<KeyModel> BuildKeyboard()
+    // ---------- Input: Virtual Keyboard ----------
+    private void HandleVirtualKey(string key)
     {
-        // Layout grob wie Wordle (3 Reihen + Enter/Backspace) :contentReference[oaicite:4]{index=4}
-        var keys = new List<KeyModel>();
+        if (GameService.IsBlocked()) return;
 
-        keys.AddRange("QWERTYUIOP".Select(c => new KeyModel { Label = c.ToString() }));
-        keys.AddRange("ASDFGHJKL".Select(c => new KeyModel { Label = c.ToString() }));
-        keys.Add(new KeyModel { Label = "Enter", IsWide = true });
-        keys.AddRange("ZXCVBNM".Select(c => new KeyModel { Label = c.ToString() }));
-        keys.Add(new KeyModel { Label = "Back", IsWide = true, Icon = "backspace" });
+        if (key == "Enter") 
+            GameService.SubmitGuess();
+        else if (key == "Back") 
+            GameService.Backspace();
+        else if (key.Length == 1 && char.IsLetter(key[0])) 
+            GameService.AddLetter(char.ToUpperInvariant(key[0]));
+    }
 
-        // Dummy-Färbung wie im Mockup (E/R/T absent, A present, S correct) :contentReference[oaicite:5]{index=5}
-        keys.Single(k => k.Label == "E").State = KeyState.Absent;
-        keys.Single(k => k.Label == "R").State = KeyState.Absent;
-        keys.Single(k => k.Label == "T").State = KeyState.Absent;
-        keys.Single(k => k.Label == "A").State = KeyState.Present;
-        keys.Single(k => k.Label == "S").State = KeyState.Correct;
+    // ---------- Input: Physical Keyboard ----------
+    private void HandlePhysicalKeyDown(KeyboardEventArgs e)
+    {
+        if (GameService.IsBlocked()) return;
 
-        return keys;
+        if (e.Key == "Enter") 
+            GameService.SubmitGuess();
+        else if (e.Key == "Backspace") 
+            GameService.Backspace();
+        else if (e.Key.Length == 1 && char.IsLetter(e.Key[0])) 
+            GameService.AddLetter(char.ToUpperInvariant(e.Key[0]));
+    }
+
+    public void Dispose()
+    {
+        GameService.OnStateChanged -= StateHasChanged;
     }
 }
+

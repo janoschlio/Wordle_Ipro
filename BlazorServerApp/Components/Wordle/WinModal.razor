@@ -1,0 +1,32 @@
+@if (IsOpen)
+{
+    <div class="modal-overlay">
+        <div class="modal-card modal-win">
+            <div class="modal-icon-wrap">
+                <span class="material-symbols-outlined modal-icon">stars</span>
+            </div>
+
+            <div>
+                <h2 class="modal-title">Splendid!</h2>
+                <p class="modal-sub">You found the word</p>
+            </div>
+
+            <div class="modal-word">
+                @foreach (var ch in Word)
+                {
+                    <div class="modal-tile">@ch</div>
+                }
+            </div>
+
+            <button class="modal-btn modal-btn-win" @onclick="OnPlayAgain">
+                PLAY AGAIN
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public string Word { get; set; } = "";
+    [Parameter] public EventCallback OnPlayAgain { get; set; }
+}

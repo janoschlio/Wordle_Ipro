@@ -1,10 +1,14 @@
 using BlazorServerApp.Components;
+using BlazorServerApp.Services.Wordle;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Register Wordle game service
+builder.Services.AddScoped<WordleGameService>();
 
 var app = builder.Build();
 

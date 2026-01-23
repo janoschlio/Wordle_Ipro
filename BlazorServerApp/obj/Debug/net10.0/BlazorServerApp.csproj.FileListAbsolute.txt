@@ -84,4 +84,4 @@
 /Users/janoschlio/Documents/Programming/IPRO/Wordle_Ipro/BlazorServerApp/obj/Debug/net10.0/BlazorServerApp.genruntimeconfig.cache
 /Users/janoschlio/Documents/Programming/IPRO/Wordle_Ipro/BlazorServerApp/obj/Debug/net10.0/ref/BlazorServerApp.dll
 /Users/janoschlio/Documents/Programming/IPRO/Wordle_Ipro/BlazorServerApp/obj/Debug/net10.0/compressed/wmifj6zwl9-{0}-47d0g4260b-47d0g4260b.gz
-/Users/janoschlio/Documents/Programming/IPRO/Wordle_Ipro/BlazorServerApp/obj/Debug/net10.0/compressed/gc13x6t44d-{0}-8sim4g8kln-8sim4g8kln.gz
+/Users/janoschlio/Documents/Programming/IPRO/Wordle_Ipro/BlazorServerApp/obj/Debug/net10.0/compressed/gc13x6t44d-{0}-5g9lzadsfq-5g9lzadsfq.gz
