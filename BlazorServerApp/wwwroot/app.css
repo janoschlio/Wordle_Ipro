@@ -1,4 +1,9 @@
-@import "wordle.css";
+/* Modular CSS Imports */
+@import "css/variables.css";
+@import "css/layout.css";
+@import "css/components.css";
+@import "css/modals.css";
+@import "css/theme-toggle.css";
 
 html,
 body {

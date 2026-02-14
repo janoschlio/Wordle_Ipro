@@ -1,0 +1,69 @@
+/* ============================================
+   Theme Toggle Button
+   ============================================ */
+
+.theme-toggle {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    position: relative;
+    transition: background-color var(--transition-base);
+}
+
+.theme-toggle:hover {
+    background: var(--bg-interactive-subtle);
+}
+
+.theme-toggle-icon {
+    position: absolute;
+    font-size: 24px;
+    transition: all var(--transition-base);
+    color: var(--text-secondary);
+}
+
+/* Light mode icon - visible in light mode */
+.theme-toggle-icon-light {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+/* Dark mode icon - hidden in light mode */
+.theme-toggle-icon-dark {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.5);
+}
+
+/* Dark mode - swap visibility */
+[data-theme="dark"] .theme-toggle-icon-light {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.5);
+}
+
+[data-theme="dark"] .theme-toggle-icon-dark {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+    color: var(--color-primary);
+}
+
+/* Light mode active state */
+[data-theme="light"] .theme-toggle-icon-light {
+    color: var(--color-warning);
+}
+
+/* Hover effect */
+.theme-toggle:hover .theme-toggle-icon {
+    transform: scale(1.1);
+}
+
+[data-theme="dark"] .theme-toggle:hover .theme-toggle-icon-dark {
+    color: var(--color-primary-light);
+}
+
+[data-theme="light"] .theme-toggle:hover .theme-toggle-icon-light {
+    color: #f97316;
+}

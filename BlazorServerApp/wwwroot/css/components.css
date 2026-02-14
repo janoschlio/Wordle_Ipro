@@ -1,0 +1,232 @@
+/* ============================================
+   UI Components
+   Tiles, Keyboard, Buttons, Legend
+   ============================================ */
+
+/* ========== Tiles ========== */
+.tile {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--color-tile-border);
+    background: transparent;
+    font-size: 1.5rem;
+    font-weight: 800;
+    user-select: none;
+    transition: all var(--transition-base);
+}
+
+@media (min-width: 768px) {
+    .tile {
+        width: 64px;
+        height: 64px;
+    }
+}
+
+.tile.empty {
+    background: transparent;
+    border-color: var(--color-tile-border);
+}
+
+.tile.filled {
+    background: transparent;
+    border-color: var(--color-tile-filled);
+}
+
+.tile.correct {
+    background: var(--color-tile-correct);
+    border-color: var(--color-tile-correct);
+    color: white;
+}
+
+.tile.present {
+    background: var(--color-tile-present);
+    border-color: var(--color-tile-present);
+    color: white;
+}
+
+.tile.absent {
+    background: var(--color-tile-absent);
+    border-color: var(--color-tile-absent);
+    color: white;
+}
+
+/* ========== Keyboard ========== */
+.keyboard {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    user-select: none;
+}
+
+.kb-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.375rem;
+}
+
+.kb-key {
+    height: 56px;
+    flex: 1;
+    max-width: 50px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.kb-key.neutral {
+    background: var(--bg-interactive);
+    color: var(--text-primary);
+}
+
+.kb-key.neutral:hover {
+    background: var(--bg-interactive-hover);
+}
+
+.kb-key.absent {
+    background: var(--color-tile-absent);
+    color: white;
+}
+
+.kb-key.present {
+    background: var(--color-tile-present);
+    color: white;
+}
+
+.kb-key.correct {
+    background: var(--color-tile-correct);
+    color: white;
+}
+
+.kb-key.wide {
+    flex: 0 0 auto;
+    min-width: 65px;
+    padding: 0 var(--space-md);
+    font-size: 0.75rem;
+    background: var(--bg-interactive-medium);
+}
+
+.kb-key.wide:hover {
+    background: var(--bg-interactive-medium-hover);
+}
+
+/* ========== Buttons ========== */
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color var(--transition-base);
+}
+
+.icon-btn:hover {
+    color: var(--color-primary);
+}
+
+/* ========== Legend ========== */
+.legend {
+    margin-top: var(--space-lg);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    display: flex;
+    gap: var(--space-xl);
+    padding-bottom: var(--space-lg);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+.legend-dot.correct {
+    background: var(--color-tile-correct);
+}
+
+.legend-dot.present {
+    background: var(--color-tile-present);
+}
+
+.legend-dot.absent {
+    background: var(--color-tile-absent);
+}
+
+/* ========== Help Popover ========== */
+.help-popover {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.help-popover__panel {
+    position: absolute;
+    top: 44px;
+    right: 0;
+    width: 320px;
+    padding: 12px 12px 10px;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-primary);
+    background: var(--bg-popover);
+    box-shadow: var(--shadow-lg);
+    color: var(--text-primary);
+    z-index: 50;
+    text-align: left;
+}
+
+.help-popover__panel h3 {
+    margin: 0 0 6px 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.help-popover__panel ul {
+    margin: 0 0 10px 18px;
+    padding: 0;
+}
+
+.help-popover__panel p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.help-popover__panel .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.help-popover__panel .dot.correct {
+    background: var(--color-tile-correct);
+}
+
+.help-popover__panel .dot.present {
+    background: var(--color-tile-present);
+}
+
+.help-popover__panel .dot.absent {
+    background: var(--color-tile-absent);
+}

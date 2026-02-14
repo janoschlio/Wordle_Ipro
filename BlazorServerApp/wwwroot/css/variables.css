@@ -1,0 +1,145 @@
+/* ============================================
+   CSS Variables & Color System
+   Dark/Light Mode mit light-dark() Function
+   ============================================ */
+
+:root {
+    /* Color Scheme aktivieren */
+    color-scheme: light dark;
+
+    /* ========== Light Mode Colors ========== */
+    --color-light-bg-primary: #ffffff;
+    --color-light-bg-secondary: #f6f8f6;
+    --color-light-bg-sidebar: #fafbfa;
+    --color-light-text-primary: #0f172a;
+    --color-light-text-secondary: #475569;
+    --color-light-text-muted: #64748b;
+    --color-light-border: #e2e8f0;
+
+    /* ========== Dark Mode Colors ========== */
+    --color-dark-bg-primary: #0a1210;
+    --color-dark-bg-secondary: #102216;
+    --color-dark-bg-sidebar: #0d1914;
+    --color-dark-text-primary: #f8fafc;
+    --color-dark-text-secondary: #cbd5e1;
+    --color-dark-text-muted: #9db9a6;
+    --color-dark-border: #1e3a28;
+
+    /* ========== Brand Colors ========== */
+    --color-primary: #13ec5b;
+    --color-primary-dark: #0fb84b;
+    --color-primary-light: #4aef7f;
+
+    /* ========== Tile States ========== */
+    /* Correct tile - Hellgrün in light, primärgrün in dark */
+    --tile-correct-light: #22c55e;
+    --tile-correct-dark: #13ec5b;
+    --color-tile-correct: light-dark(var(--tile-correct-light), var(--tile-correct-dark));
+
+    /* Present tile - Gelb/Gold */
+    --tile-present-light: #eab308;
+    --tile-present-dark: #fbbf24;
+    --color-tile-present: light-dark(var(--tile-present-light), var(--tile-present-dark));
+
+    /* Absent tile - Dunkelgrau */
+    --tile-absent-light: #64748b;
+    --tile-absent-dark: #3a3a3c;
+    --color-tile-absent: light-dark(var(--tile-absent-light), var(--tile-absent-dark));
+
+    /* Empty tile border */
+    --tile-border-light: #cbd5e1;
+    --tile-border-dark: #3b5443;
+    --color-tile-border: light-dark(var(--tile-border-light), var(--tile-border-dark));
+
+    /* Filled tile border */
+    --tile-filled-light: #94a3b8;
+    --tile-filled-dark: rgba(255, 255, 255, 0.4);
+    --color-tile-filled: light-dark(var(--tile-filled-light), var(--tile-filled-dark));
+
+    /* ========== Semantic Colors ========== */
+    --color-success: #10b981;
+    --color-error: #ef4444;
+    --color-warning: #f59e0b;
+
+    /* ========== Applied Colors (using light-dark()) ========== */
+    --bg-primary: light-dark(var(--color-light-bg-primary), var(--color-dark-bg-primary));
+    --bg-secondary: light-dark(var(--color-light-bg-secondary), var(--color-dark-bg-secondary));
+    --bg-sidebar: light-dark(var(--color-light-bg-sidebar), var(--color-dark-bg-sidebar));
+
+    --text-primary: light-dark(var(--color-light-text-primary), var(--color-dark-text-primary));
+    --text-secondary: light-dark(var(--color-light-text-secondary), var(--color-dark-text-secondary));
+    --text-muted: light-dark(var(--color-light-text-muted), var(--color-dark-text-muted));
+
+    --border-primary: light-dark(var(--color-light-border), var(--color-dark-border));
+
+    /* ========== Interactive/Overlay Colors ========== */
+    /* Button/interactive element backgrounds */
+    --bg-interactive-light: rgba(0, 0, 0, 0.1);
+    --bg-interactive-dark: rgba(255, 255, 255, 0.2);
+    --bg-interactive: light-dark(var(--bg-interactive-light), var(--bg-interactive-dark));
+
+    --bg-interactive-hover-light: rgba(0, 0, 0, 0.15);
+    --bg-interactive-hover-dark: rgba(255, 255, 255, 0.25);
+    --bg-interactive-hover: light-dark(var(--bg-interactive-hover-light), var(--bg-interactive-hover-dark));
+
+    --bg-interactive-subtle-light: rgba(0, 0, 0, 0.05);
+    --bg-interactive-subtle-dark: rgba(255, 255, 255, 0.05);
+    --bg-interactive-subtle: light-dark(var(--bg-interactive-subtle-light), var(--bg-interactive-subtle-dark));
+
+    --bg-interactive-medium-light: rgba(0, 0, 0, 0.12);
+    --bg-interactive-medium-dark: rgba(255, 255, 255, 0.25);
+    --bg-interactive-medium: light-dark(var(--bg-interactive-medium-light), var(--bg-interactive-medium-dark));
+
+    --bg-interactive-medium-hover-light: rgba(0, 0, 0, 0.18);
+    --bg-interactive-medium-hover-dark: rgba(255, 255, 255, 0.3);
+    --bg-interactive-medium-hover: light-dark(var(--bg-interactive-medium-hover-light), var(--bg-interactive-medium-hover-dark));
+
+    /* Primary color with opacity for active states */
+    --bg-primary-subtle-light: rgba(19, 236, 91, 0.10);
+    --bg-primary-subtle-dark: rgba(19, 236, 91, 0.15);
+    --bg-primary-subtle: light-dark(var(--bg-primary-subtle-light), var(--bg-primary-subtle-dark));
+
+    /* Modal/Popover overlays */
+    --overlay-light: rgba(255, 255, 255, 0.80);
+    --overlay-dark: rgba(16, 34, 22, 0.70);
+    --overlay: light-dark(var(--overlay-light), var(--overlay-dark));
+
+    /* Popover backgrounds */
+    --bg-popover-light: rgba(255, 255, 255, 0.98);
+    --bg-popover-dark: rgba(16, 34, 22, 0.98);
+    --bg-popover: light-dark(var(--bg-popover-light), var(--bg-popover-dark));
+
+    /* ========== Spacing ========== */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 0.75rem;
+    --space-lg: 1rem;
+    --space-xl: 1.5rem;
+    --space-2xl: 2rem;
+
+    /* ========== Border Radius ========== */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-full: 9999px;
+
+    /* ========== Shadows ========== */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --shadow-glow-primary: 0 0 50px rgba(19, 236, 91, 0.30);
+    --shadow-glow-error: 0 0 50px rgba(239, 68, 68, 0.20);
+
+    /* ========== Transitions ========== */
+    --transition-fast: 0.08s ease;
+    --transition-base: 0.15s ease;
+    --transition-slow: 0.3s ease;
+}
+
+/* ========== Base Styles ========== */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color var(--transition-slow), color var(--transition-slow);
+}

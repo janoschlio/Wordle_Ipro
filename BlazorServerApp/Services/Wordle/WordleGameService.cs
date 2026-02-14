@@ -16,7 +16,7 @@ public class WordleGameService
     private int _currentRow;
     private int _currentCol;
 
-    public bool IsGameWon { get; private set; }
+    public bool IsGameWon  { get; private set; }
     public bool IsGameLost { get; private set; }
 
     // Event to notify UI when state changes
@@ -29,14 +29,14 @@ public class WordleGameService
 
     public void ResetGame()
     {
-        IsGameWon = false;
+        IsGameWon  = false;
         IsGameLost = false;
 
         _currentRow = 0;
         _currentCol = 0;
 
         Tiles = Enumerable.Range(0, Rows)
-            .Select(_ => Enumerable.Range(0, Cols).Select(__ => new TileModel()).ToArray())
+            .Select(_ => Enumerable.Range(0, Cols).Select(_ => new TileModel()).ToArray())
             .ToArray();
 
         Keys = BuildKeyboard().ToList();
@@ -53,11 +53,11 @@ public class WordleGameService
 
         // Verhindere Eingabe von ausgegrauten Buchstaben
         var key = Keys.FirstOrDefault(k => k.Label.Length == 1 && k.Label[0] == letter);
-        if (key?.State == KeyState.Absent)
+        if (KeyState.Absent == key?.State)
             return;
 
         Tiles[_currentRow][_currentCol].Letter = letter;
-        Tiles[_currentRow][_currentCol].State = TileState.Filled;
+        Tiles[_currentRow][_currentCol].State  = TileState.Filled;
         _currentCol++;
 
         NotifyStateChanged();
@@ -103,7 +103,7 @@ public class WordleGameService
         NotifyStateChanged();
     }
 
-    // Wordle Bewertung (mit Duplicate-Letters korrekt)
+    // Wordle Bewertung 
     private void EvaluateRow(int row, string guess, string target)
     {
         var result = new TileState[Cols];

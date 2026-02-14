@@ -31,7 +31,7 @@
             </div>
             <div></div>
         </aside>
-
+        
         <main class="wordle-main">
             <header class="wordle-header">
                 <div class="header-inner">
@@ -56,6 +56,7 @@
                         <p>If a letter appears multiple times, tiles are colored based on how many times that letter
                             occurs in the hidden word.</p>
                     </GameRulesPopover>
+                    <ThemeToggle />
                 </div>
             </header>
 
@@ -103,6 +104,7 @@
     }
 
     // ---------- Input: Virtual Keyboard ----------
+    // #TODO Schöner machen 
     private void HandleVirtualKey(string key)
     {
         if (GameService.IsBlocked()) return;
