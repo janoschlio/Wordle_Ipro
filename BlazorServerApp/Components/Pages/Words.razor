@@ -1,0 +1,218 @@
+@page "/words"
+@using BlazorServerApp.Data.DTOs
+@using BlazorServerApp.Services.Wordle
+@inject WordListService WordListService
+@rendermode InteractiveServer
+
+<PageTitle>Words - Wordle Pro</PageTitle>
+
+<div class="words-container">
+    <header class="words-header">
+        <div>
+            <h2 class="words-title">Word List</h2>
+            <p class="words-subtitle">
+                The game draws its hidden word at random from this list.
+            </p>
+        </div>
+        <div class="words-count">
+            <span class="words-count-value">@_wordCount</span>
+            <span class="words-count-label">words</span>
+        </div>
+    </header>
+
+    <section class="words-panel">
+        <h3 class="words-section-title">Import your own list</h3>
+        <p class="words-hint">
+            One word per line &mdash; commas, semicolons and spaces work as
+            separators too. Lines starting with <code>#</code> are ignored.
+            Every word must have exactly @WordListService.WordLength letters
+            from A&ndash;Z. Words containing umlauts are rejected, because the
+            on-screen keyboard has no keys for them.
+        </p>
+
+        <div class="words-upload">
+            <label class="words-file-label">
+                <span class="material-symbols-outlined">upload_file</span>
+                <span>@(_fileName ?? "Choose a .txt file")</span>
+                <InputFile OnChange="HandleFileSelected" accept=".txt" class="words-file-input"/>
+            </label>
+        </div>
+
+        <textarea class="words-textarea"
+                  rows="10"
+                  placeholder="@("APFEL\nBLUME\nKATZE")"
+                  @bind="_input"
+                  @bind:event="oninput"></textarea>
+
+        <div class="words-mode">
+            <label class="words-radio">
+                <input type="radio"
+                       name="import-mode"
+                       checked="@(!_replaceExisting)"
+                       @onchange="@(() => _replaceExisting = false)"/>
+                <span>Add to current list</span>
+            </label>
+            <label class="words-radio">
+                <input type="radio"
+                       name="import-mode"
+                       checked="@_replaceExisting"
+                       @onchange="@(() => _replaceExisting = true)"/>
+                <span>Replace current list</span>
+            </label>
+        </div>
+
+        <div class="words-actions">
+            <button class="words-btn words-btn-primary"
+                    disabled="@(_isBusy || string.IsNullOrWhiteSpace(_input))"
+                    @onclick="ImportAsync">
+                @(_isBusy ? "Importing..." : "Import")
+            </button>
+            <button class="words-btn words-btn-ghost"
+                    disabled="@_isBusy"
+                    @onclick="ClearInput">
+                Clear
+            </button>
+        </div>
+
+        @if (_error is not null)
+        {
+            <div class="words-result words-result-error">
+                <span class="material-symbols-outlined">error</span>
+                <span>@_error</span>
+            </div>
+        }
+        else if (_result is not null)
+        {
+            <div class="words-result words-result-success">
+                <span class="material-symbols-outlined">check_circle</span>
+                <div>
+                    <p class="words-result-main">
+                        @_result.Added @(_result.Added == 1 ? "word" : "words")
+                        @(_result.Replaced ? "imported (list replaced)" : "added")
+                        &mdash; @_result.TotalAfterImport in total.
+                    </p>
+                    @if (_result.Duplicates > 0 || _result.Rejected > 0)
+                    {
+                        <p class="words-result-detail">
+                            @if (_result.Duplicates > 0)
+                            {
+                                <span>@_result.Duplicates skipped as duplicates. </span>
+                            }
+                            @if (_result.Rejected > 0)
+                            {
+                                <span>
+                                    @_result.Rejected rejected as invalid
+                                    (e.g. @string.Join(", ", _result.RejectedSamples)).
+                                </span>
+                            }
+                        </p>
+                    }
+                </div>
+            </div>
+        }
+    </section>
+
+    <section class="words-panel">
+        <h3 class="words-section-title">Current list</h3>
+
+        @if (_words.Count == 0)
+        {
+            <p class="words-hint">
+                The list is empty &mdash; the game falls back to a single fixed
+                word until you import something.
+            </p>
+        }
+        else
+        {
+            <div class="words-grid">
+                @foreach (var word in _words)
+                {
+                    <span class="words-chip">@word</span>
+                }
+            </div>
+        }
+    </section>
+</div>
+
+@code {
+    private const long MaxUploadBytes = 1024 * 1024;
+
+    private List<string> _words = [];
+    private int _wordCount;
+
+    private string _input = string.Empty;
+    private string? _fileName;
+    private bool _replaceExisting;
+    private bool _isBusy;
+
+    private WordImportResultDto? _result;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWordsAsync();
+    }
+
+    private async Task LoadWordsAsync()
+    {
+        _words = await WordListService.GetAllAsync();
+        _wordCount = _words.Count;
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        _result = null;
+        _error = null;
+
+        var file = e.File;
+
+        if (file.Size > MaxUploadBytes)
+        {
+            _error = $"The file is too large (max {MaxUploadBytes / 1024} KB).";
+            _fileName = null;
+            return;
+        }
+
+        try
+        {
+            await using var stream = file.OpenReadStream(MaxUploadBytes);
+            using var reader = new StreamReader(stream);
+
+            _input = await reader.ReadToEndAsync();
+            _fileName = file.Name;
+        }
+        catch (IOException ex)
+        {
+            _error = $"Could not read the file: {ex.Message}";
+            _fileName = null;
+        }
+    }
+
+    private async Task ImportAsync()
+    {
+        _isBusy = true;
+        _result = null;
+        _error = null;
+
+        try
+        {
+            _result = await WordListService.ImportAsync(_input, _replaceExisting);
+            await LoadWordsAsync();
+
+            _input = string.Empty;
+            _fileName = null;
+        }
+        finally
+        {
+            _isBusy = false;
+        }
+    }
+
+    private void ClearInput()
+    {
+        _input = string.Empty;
+        _fileName = null;
+        _result = null;
+        _error = null;
+    }
+}

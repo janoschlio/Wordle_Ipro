@@ -5,9 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlazorServerApp.Services.Statistics;
 
-/// <summary>
-/// Service for managing game statistics
-/// </summary>
 public class StatisticsService
 {
     private readonly WordleDbContext _context;
@@ -16,19 +13,13 @@ public class StatisticsService
     {
         _context = context;
     }
-
-    /// <summary>
-    /// Saves a game result to the database
-    /// </summary>
+    
     public async Task SaveGameResultAsync(GameResult gameResult)
     {
         _context.GameResults.Add(gameResult);
         await _context.SaveChangesAsync();
     }
-
-    /// <summary>
-    /// Gets aggregated statistics for all games
-    /// </summary>
+    
     public async Task<StatisticsDto> GetStatisticsAsync()
     {
         var allResults = await _context.GameResults
@@ -54,11 +45,8 @@ public class StatisticsService
 
         return stats;
     }
-
-    /// <summary>
-    /// Gets the most recent N game results
-    /// </summary>
-    public async Task<List<GameResultDto>> GetRecentPerformanceAsync(int count)
+    
+    private async Task<List<GameResultDto>> GetRecentPerformanceAsync(int count)
     {
         return await _context.GameResults
             .OrderByDescending(g => g.PlayedAt)
@@ -71,10 +59,7 @@ public class StatisticsService
             })
             .ToListAsync();
     }
-
-    /// <summary>
-    /// Calculates the distribution of wins by guess count
-    /// </summary>
+    
     private Dictionary<int, int> CalculateGuessDistribution(List<GameResult> wonGames)
     {
         var distribution = new Dictionary<int, int>();
@@ -96,10 +81,7 @@ public class StatisticsService
 
         return distribution;
     }
-
-    /// <summary>
-    /// Calculates current streak and maximum streak
-    /// </summary>
+    
     private (int currentStreak, int maxStreak) CalculateStreaks(List<GameResult> results)
     {
         if (!results.Any())

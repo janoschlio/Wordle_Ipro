@@ -30,15 +30,24 @@ builder.Services.AddDbContext<WordleDbContext>(options =>
 
 // Register Services
 builder.Services.AddScoped<StatisticsService>();
+builder.Services.AddScoped<WordListService>();
 builder.Services.AddScoped<WordleGameService>();
 
 var app = builder.Build();
 
-// Ensure database is created
+// Ensure database is created and the default word list is loaded
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<WordleDbContext>();
     await dbContext.Database.EnsureCreatedAsync();
+
+    var wordListService = scope.ServiceProvider.GetRequiredService<WordListService>();
+    var seeded = await wordListService.EnsureSeededAsync(app.Environment.ContentRootPath);
+
+    if (seeded > 0)
+    {
+        app.Logger.LogInformation("Default word list loaded: {Count} words", seeded);
+    }
 }
 
 // Configure the HTTP request pipeline.

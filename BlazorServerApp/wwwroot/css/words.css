@@ -1,0 +1,254 @@
+/* ============================================
+   Word List Page Styles
+   ============================================ */
+
+.words-container {
+    max-width: 80rem;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2rem;
+}
+
+/* ========== Header ========== */
+.words-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    margin-bottom: 2.5rem;
+}
+
+.words-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.025em;
+    margin: 0;
+}
+
+.words-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: var(--space-xs) 0 0;
+}
+
+.words-count {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+}
+
+.words-count-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+}
+
+.words-count-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+/* ========== Panels ========== */
+.words-panel {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.words-section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-sm);
+}
+
+.words-hint {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 0 0 var(--space-lg);
+}
+
+.words-hint code {
+    background-color: var(--bg-interactive-subtle);
+    padding: 0.1rem 0.3rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+}
+
+/* ========== File Upload ========== */
+.words-upload {
+    margin-bottom: var(--space-lg);
+}
+
+.words-file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    border: 1px dashed var(--border-primary);
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color var(--transition-base), background-color var(--transition-base);
+}
+
+.words-file-label:hover {
+    border-color: var(--color-primary);
+    background-color: var(--bg-interactive-subtle);
+}
+
+/* Der native Datei-Dialog wird ueber das Label ausgeloest. */
+.words-file-input {
+    display: none;
+}
+
+/* ========== Textarea ========== */
+.words-textarea {
+    width: 100%;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color var(--transition-base);
+}
+
+.words-textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* ========== Import Mode ========== */
+.words-mode {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xl);
+    margin: var(--space-lg) 0;
+}
+
+.words-radio {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.words-radio input {
+    accent-color: var(--color-primary);
+    cursor: pointer;
+}
+
+/* ========== Buttons ========== */
+.words-actions {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.words-btn {
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-lg);
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-base), opacity var(--transition-base);
+}
+
+.words-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.words-btn-primary {
+    background-color: var(--color-primary);
+    color: #0a1210;
+}
+
+.words-btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-dark);
+}
+
+.words-btn-ghost {
+    background-color: var(--bg-interactive-subtle);
+    color: var(--text-secondary);
+}
+
+.words-btn-ghost:hover:not(:disabled) {
+    background-color: var(--bg-interactive-hover);
+}
+
+/* ========== Result Message ========== */
+.words-result {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+}
+
+.words-result-success {
+    background-color: var(--bg-primary-subtle);
+    color: var(--text-primary);
+}
+
+.words-result-error {
+    background-color: rgba(239, 68, 68, 0.12);
+    color: var(--color-error);
+}
+
+.words-result-main {
+    margin: 0;
+    font-weight: 500;
+}
+
+.words-result-detail {
+    margin: var(--space-xs) 0 0;
+    color: var(--text-muted);
+}
+
+/* ========== Word Grid ========== */
+.words-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.words-chip {
+    padding: var(--space-xs) var(--space-md);
+    background-color: var(--bg-interactive-subtle);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.8125rem;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 640px) {
+    .words-container {
+        padding: var(--space-lg);
+    }
+
+    .words-header {
+        flex-direction: column;
+    }
+}

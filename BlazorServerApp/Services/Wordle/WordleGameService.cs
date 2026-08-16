@@ -7,12 +7,14 @@ namespace BlazorServerApp.Services.Wordle;
 public class WordleGameService
 {
     private const int Rows = 6;
-    private const int Cols = 5;
+    private const int Cols = WordListService.WordLength;
+    
+    private const string FallbackWord = "SPIEL";
 
     private readonly StatisticsService? _statisticsService;
+    private readonly WordListService? _wordListService;
 
-    // Demo: fixes Wort
-    public string TargetWord { get; private set; } = "SLANG";
+    public string TargetWord { get; private set; } = FallbackWord;
 
     public TileModel[][] Tiles { get; private set; } = default!;
     public List<KeyModel> Keys { get; private set; } = default!;
@@ -23,17 +25,27 @@ public class WordleGameService
 
     public bool IsGameWon { get; private set; }
     public bool IsGameLost { get; private set; }
-
-    // Event to notify UI when state changes
+    
     public event Action? OnStateChanged;
 
-    public WordleGameService(StatisticsService? statisticsService = null)
+    public WordleGameService(
+        StatisticsService? statisticsService = null,
+        WordListService? wordListService = null)
     {
         _statisticsService = statisticsService;
-        ResetGame();
+        _wordListService = wordListService;
+        ResetBoard();
     }
+    
+    public async Task ResetGameAsync()
+    {
+        ResetBoard();
+        TargetWord = await PickTargetWordAsync();
 
-    public void ResetGame()
+        NotifyStateChanged();
+    }
+    
+    private void ResetBoard()
     {
         IsGameWon = false;
         IsGameLost = false;
@@ -49,6 +61,16 @@ public class WordleGameService
         Keys = BuildKeyboard().ToList();
 
         NotifyStateChanged();
+    }
+    
+    private async Task<string> PickTargetWordAsync()
+    {
+        if (_wordListService is null)
+            return FallbackWord;
+
+        var word = await _wordListService.GetRandomWordAsync();
+
+        return string.IsNullOrEmpty(word) ? FallbackWord : word;
     }
 
     public bool IsBlocked() => IsGameWon || IsGameLost;
@@ -83,7 +105,7 @@ public class WordleGameService
         NotifyStateChanged();
     }
 
-    public async void SubmitGuess()
+    public async Task SubmitGuessAsync()
     {
         if (IsBlocked() || _currentCol < Cols)
             return; // nur wenn 5 Buchstaben
@@ -204,10 +226,7 @@ public class WordleGameService
     }
 
     private void NotifyStateChanged() => OnStateChanged?.Invoke();
-
-    /// <summary>
-    /// Saves the current game result to the database
-    /// </summary>
+    
     private async Task SaveGameResultAsync()
     {
         if (_statisticsService == null)

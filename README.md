@@ -89,17 +89,61 @@ Danach ist die App unter `http://localhost:10000` erreichbar.
 ```
 Wordle_Ipro/
 ├── BlazorServerApp/        # Hauptanwendung
-│   ├── Components/         # Blazor-Komponenten
-│   │   ├── Layout/        # Layout-Komponenten
-│   │   └── Pages/         # Seiten/Routen
-│   ├── Data/              # Entity Framework DbContext & Models (wird erstellt)
-│   ├── Migrations/        # EF Core Migrationen (wird erstellt)
-│   ├── wwwroot/           # Statische Dateien (CSS, JS, Bilder)
-│   ├── Program.cs         # Einstiegspunkt
-│   └── appsettings.json   # Konfiguration & Connection String
-├── Milestones.md          # Projekt-Milestones
-└── README.md              # Diese Datei
+│   ├── Components/
+│   │   ├── Layout/         # Layout-Komponenten
+│   │   ├── Pages/          # Seiten/Routen (Game, Statistics, Words)
+│   │   ├── Statistics/     # Statistik-Komponenten
+│   │   └── Wordle/         # Spielbrett, Tastatur, Modals
+│   ├── Data/
+│   │   ├── DTOs/           # Datentransfer-Objekte
+│   │   ├── Models/         # EF-Core-Entitäten (GameResult, Word)
+│   │   ├── WordleDbContext.cs
+│   │   └── words.txt       # Standard-Wortliste
+│   ├── Services/
+│   │   ├── Statistics/     # StatisticsService
+│   │   └── Wordle/         # WordleGameService, WordListService
+│   ├── wwwroot/            # Statische Dateien (CSS, JS, Bilder)
+│   ├── Program.cs          # Einstiegspunkt
+│   └── appsettings.json    # Konfiguration & Connection String
+├── Dockerfile              # Container-Build für Render
+├── render.yaml             # Render Blueprint
+├── Milestones.md           # Projekt-Milestones
+└── README.md               # Diese Datei
 ```
+
+## 📝 Wortliste
+
+Das Spiel zieht sein Lösungswort zufällig aus der Tabelle `Words`.
+
+### Standard-Liste
+
+[`BlazorServerApp/Data/words.txt`](./BlazorServerApp/Data/words.txt) enthält rund
+350 deutsche Wörter. Die Datei wird beim Start eingelesen — **aber nur, wenn die
+Tabelle noch leer ist**. Eine im Betrieb hochgeladene Liste wird also nicht bei
+jedem Neustart wieder überschrieben.
+
+### Eigene Liste laden
+
+Über die Seite **Words** lässt sich eine eigene Liste einfügen oder als
+`.txt`-Datei hochladen, wahlweise ergänzend oder als Ersatz der bestehenden.
+
+Regeln für den Import:
+
+| Regel | Verhalten |
+|---|---|
+| Trennzeichen | Zeilenumbruch, Komma, Semikolon, Leerzeichen |
+| Kommentare | Zeilen, die mit `#` beginnen, werden ignoriert |
+| Gross-/Kleinschreibung | wird automatisch in Grossbuchstaben umgewandelt |
+| Wortlänge | genau 5 Buchstaben, sonst abgelehnt |
+| Zeichen | nur A–Z; Umlaute werden abgelehnt, da die Bildschirmtastatur keine Umlaut-Tasten hat |
+| Duplikate | werden übersprungen (eindeutiger Index auf `Words.Value`) |
+
+Nach dem Import meldet die Seite zurück, wie viele Wörter hinzugefügt,
+übersprungen und abgelehnt wurden — inklusive Beispielen für die abgelehnten.
+
+> **Auf Render Free beachten:** Eine hochgeladene Liste liegt in der SQLite-Datei
+> und ist nach einem Neustart des Containers weg. Dauerhafte Änderungen gehören
+> deshalb in `words.txt` und werden mit dem nächsten Deployment ausgerollt.
 
 ## 🎮 Spielregeln
 
