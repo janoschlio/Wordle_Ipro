@@ -3,7 +3,7 @@
 @using BlazorServerApp.Services.Wordle
 @implements IDisposable
 
-<div tabindex="0" class="key-capture" @onkeydown="HandlePhysicalKeyDown" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; outline: none;">
+<div tabindex="0" class="key-capture" @ref="_keyCapture" @onkeydown="HandlePhysicalKeyDown" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; outline: none;">
     <header class="wordle-header">
         <div class="header-inner">
             <h1 class="wordle-title">WORDLE</h1>
@@ -55,48 +55,58 @@
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Inject] private WordleGameService GameService { get; set; } = default!;
 
+    private ElementReference _keyCapture;
+    private bool _shouldFocus;
+
     private TileModel[][] Tiles => GameService.Tiles;
     private List<KeyModel> Keys => GameService.Keys;
     private string TargetWord => GameService.TargetWord;
     private bool showWin => GameService.IsGameWon;
     private bool showLose => GameService.IsGameLost;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         GameService.OnStateChanged += StateHasChanged;
-        ResetGame();
+        await ResetGame();
     }
 
-    private void ResetGame()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        GameService.ResetGame();
+        if (firstRender || _shouldFocus)
+        {
+            _shouldFocus = false;
+            await _keyCapture.FocusAsync();
+        }
+    }
+
+    private async Task ResetGame()
+    {
+        await GameService.ResetGameAsync();
+        _shouldFocus = true;
     }
 
     // ---------- Input: Virtual Keyboard ----------
-    // #TODO Schöner machen 
-    private void HandleVirtualKey(string key)
+    private async Task HandleVirtualKey(string key)
     {
-        if (GameService.IsBlocked()) return;
-
-        if (key == "Enter") 
-            GameService.SubmitGuess();
-        else if (key == "Back") 
-            GameService.Backspace();
-        else if (key.Length == 1 && char.IsLetter(key[0])) 
-            GameService.AddLetter(char.ToUpperInvariant(key[0]));
+        await HandleInput(key == "Back" ? "Backspace" : key);
     }
 
     // ---------- Input: Physical Keyboard ----------
-    private void HandlePhysicalKeyDown(KeyboardEventArgs e)
+    private async Task HandlePhysicalKeyDown(KeyboardEventArgs e)
+    {
+        await HandleInput(e.Key);
+    }
+    
+    private async Task HandleInput(string key)
     {
         if (GameService.IsBlocked()) return;
 
-        if (e.Key == "Enter") 
-            GameService.SubmitGuess();
-        else if (e.Key == "Backspace") 
+        if (key == "Enter")
+            await GameService.SubmitGuessAsync();
+        else if (key == "Backspace")
             GameService.Backspace();
-        else if (e.Key.Length == 1 && char.IsLetter(e.Key[0])) 
-            GameService.AddLetter(char.ToUpperInvariant(e.Key[0]));
+        else if (key.Length == 1 && char.IsLetter(key[0]))
+            GameService.AddLetter(char.ToUpperInvariant(key[0]));
     }
 
     public void Dispose()
