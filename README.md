@@ -17,16 +17,16 @@ Das Projekt folgt einem strukturierten Entwicklungsplan mit 6 Milestones: [Miles
 - **Frontend:** Blazor Components, Razor, CSS
 - **Backend:** ASP.NET Core
 - **ORM:** Entity Framework Core
-- **Datenbank:** MS SQL Server (Docker Container)
-- **Deployment:** Linux Server
-- **Containerisierung:** Docker & Docker Compose
+- **Datenbank:** SQLite (Datei `wordle.db`, wird beim Start automatisch angelegt)
+- **Deployment:** Render.com (Docker)
+- **Containerisierung:** Docker
 
 ## 🛠️ Setup & Installation
 
 ### Voraussetzungen
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download) oder höher
-- [Docker](https://www.docker.com/get-started) und Docker Compose
 - Ein Code-Editor (z.B. Visual Studio, VS Code, Rider)
+- Optional: [Docker](https://www.docker.com/get-started), um den Container lokal zu testen
 
 ### Projekt lokal starten
 
@@ -36,34 +36,26 @@ Das Projekt folgt einem strukturierten Entwicklungsplan mit 6 Milestones: [Miles
    cd Wordle_Ipro
    ```
 
-2. **MS SQL Server Container starten:**
-   ```bash
-   docker-compose up -d
-   ```
-   Dies startet einen MS SQL Server Container im Hintergrund.
-
-3. **In das Blazor-Projekt wechseln:**
+2. **In das Blazor-Projekt wechseln:**
    ```bash
    cd BlazorServerApp
    ```
 
-4. **Abhängigkeiten wiederherstellen:**
+3. **Abhängigkeiten wiederherstellen:**
    ```bash
    dotnet restore
    ```
 
-5. **Datenbank-Migrationen anwenden:**
-   ```bash
-   dotnet ef database update
-   ```
-
-6. **Anwendung starten:**
+4. **Anwendung starten:**
    ```bash
    dotnet run
    ```
+   Die Datenbank wird beim ersten Start via `EnsureCreatedAsync()` automatisch
+   angelegt und mit den Seed-Wörtern befüllt. Es ist kein separater
+   Migrations-Schritt nötig.
 
-7. **Im Browser öffnen:**
-   - Die Anwendung läuft standardmäßig auf `https://localhost:5001` oder `http://localhost:5000`
+5. **Im Browser öffnen:**
+   - Die Anwendung läuft standardmäßig auf `http://localhost:5066`
    - Die URL wird beim Start in der Konsole angezeigt
 
 ### Entwicklungsmodus mit Hot Reload
@@ -74,23 +66,23 @@ dotnet watch
 ```
 Änderungen am Code werden automatisch erkannt und die Anwendung neu geladen.
 
-### Docker Container verwalten
+### Datenbank zurücksetzen
 
-**Container stoppen:**
+Die SQLite-Datei einfach löschen — sie wird beim nächsten Start neu erzeugt:
 ```bash
-docker-compose down
+rm BlazorServerApp/wordle.db
 ```
 
-**Container-Logs anzeigen:**
-```bash
-docker-compose logs -f mssql
-```
+### Container lokal testen
 
-**Datenbank zurücksetzen:**
+Das Image entspricht 1:1 dem, was Render baut:
 ```bash
-docker-compose down -v  # Löscht auch die Volumes
-docker-compose up -d
+docker build -t wordle-ipro .
 ```
+```bash
+docker run --rm -e PORT=10000 -p 10000:10000 wordle-ipro
+```
+Danach ist die App unter `http://localhost:10000` erreichbar.
 
 ## 📁 Projektstruktur
 
@@ -149,41 +141,42 @@ refactor: Code-Refactoring
 test: Tests hinzufügen/ändern
 ```
 
-## 🐳 Deployment auf Linux Server
+## 🐳 Deployment auf Render.com
 
-### Voraussetzungen auf dem Server
-- Docker und Docker Compose installiert
-- .NET 10.0 Runtime
-- Ports 5000/5001 (Blazor App) und 1433 (MS SQL Server) verfügbar
+Die App wird als Docker-Container deployt. Die relevanten Dateien liegen im
+Repo-Root: [`Dockerfile`](./Dockerfile), [`.dockerignore`](./.dockerignore) und
+[`render.yaml`](./render.yaml).
 
-### Deployment-Schritte
+### Vorgehen
 
-1. **Projekt auf den Server übertragen:**
-   ```bash
-   git clone <repository-url>
-   cd Wordle_Ipro
-   ```
+1. Änderungen nach GitHub pushen (Render deployt vom `main`-Branch).
+2. Auf [dashboard.render.com](https://dashboard.render.com) → **New** → **Blueprint**
+   → das Repo `Wordle_Ipro` auswählen. Render liest `render.yaml` und legt den
+   Web-Service an.
+3. Nach dem ersten Build ist die App unter
+   `https://<service-name>.onrender.com` erreichbar.
 
-2. **Umgebungsvariablen konfigurieren:**
-   ```bash
-   cp .env.example .env
-   # .env bearbeiten und Passwörter setzen
-   ```
+Alternativ ohne Blueprint: **New** → **Web Service** → Repo wählen →
+Language auf **Docker** stellen → Region `Frankfurt` → Plan `Free`.
 
-3. **MS SQL Server Container starten:**
-   ```bash
-   docker-compose up -d
-   ```
+### Was im Code dafür nötig war
 
-4. **Blazor App builden und starten:**
-   ```bash
-   cd BlazorServerApp
-   dotnet publish -c Release -o ./publish
-   dotnet ef database update
-   dotnet ./publish/BlazorServerApp.dll
-   ```
+| Thema | Lösung |
+|---|---|
+| Port | Render gibt den Port per `PORT`-Env-Variable vor. `Program.cs` liest sie aus und bindet auf `0.0.0.0:$PORT`. |
+| HTTPS | Render terminiert TLS in einem Reverse Proxy. Ohne `UseForwardedHeaders()` sähe die App jeden Request als `http` und `UseHttpsRedirection()` würde eine Redirect-Schleife erzeugen. |
+| Datenbankpfad | Über die Env-Variable `ConnectionStrings__WordleDb` konfigurierbar (im Container: `/app/data/wordle.db`). |
 
-> **Hinweis:** Für Produktions-Deployment sollte ein Reverse Proxy (z.B. Nginx) und ein Process Manager (z.B. systemd) verwendet werden.
+### ⚠️ Einschränkung des Free-Plans
+
+Der Free-Plan hat **kein persistentes Dateisystem** und fährt den Container nach
+15 Minuten ohne Traffic herunter. Beim nächsten Aufruf startet er neu — die
+SQLite-Datei und damit alle Statistiken sind dann wieder leer. Ausserdem dauert
+der erste Aufruf nach dem Spin-Down ca. 30–60 Sekunden.
+
+Für dauerhafte Persistenz gäbe es zwei Wege:
+- eine **Render-Disk** unter `/app/data` mounten (setzt einen bezahlten Plan voraus), oder
+- auf **Render Postgres** wechseln und `ConnectionStrings__WordleDb` entsprechend setzen.
 
 ## 📚 Weitere Dokumentation
 

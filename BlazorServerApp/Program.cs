@@ -1,18 +1,49 @@
 using BlazorServerApp.Components;
+using BlazorServerApp.Data;
+using BlazorServerApp.Services.Statistics;
 using BlazorServerApp.Services.Wordle;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Register Wordle game service
+// Register Database Context
+builder.Services.AddDbContext<WordleDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("WordleDb")));
+
+// Register Services
+builder.Services.AddScoped<StatisticsService>();
 builder.Services.AddScoped<WordleGameService>();
 
 var app = builder.Build();
 
+// Ensure database is created
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<WordleDbContext>();
+    await dbContext.Database.EnsureCreatedAsync();
+}
+
 // Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);

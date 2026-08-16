@@ -1,0 +1,15 @@
+.git
+.gitignore
+.idea
+.vs
+.DS_Store
+**/.DS_Store
+**/bin
+**/obj
+**/.idea
+**/.vs
+**/*.user
+**/*.db
+**/*.db-shm
+**/*.db-wal
+*.md
