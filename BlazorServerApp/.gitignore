@@ -67,3 +67,8 @@ ScaffoldingReadMe.txt
 # OS Files
 .DS_Store
 Thumbs.db
+
+# MySql DB
+*.db
+*.db-shm
+*.db-wal

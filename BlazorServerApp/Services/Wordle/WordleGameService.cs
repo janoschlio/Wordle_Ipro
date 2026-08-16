@@ -1,4 +1,6 @@
+using BlazorServerApp.Data.Models;
 using BlazorServerApp.Models.Wordle;
+using BlazorServerApp.Services.Statistics;
 
 namespace BlazorServerApp.Services.Wordle;
 
@@ -6,6 +8,8 @@ public class WordleGameService
 {
     private const int Rows = 6;
     private const int Cols = 5;
+
+    private readonly StatisticsService? _statisticsService;
 
     // Demo: fixes Wort
     public string TargetWord { get; private set; } = "SLANG";
@@ -15,25 +19,28 @@ public class WordleGameService
 
     private int _currentRow;
     private int _currentCol;
+    private DateTime _gameStartTime;
 
-    public bool IsGameWon  { get; private set; }
+    public bool IsGameWon { get; private set; }
     public bool IsGameLost { get; private set; }
 
     // Event to notify UI when state changes
     public event Action? OnStateChanged;
 
-    public WordleGameService()
+    public WordleGameService(StatisticsService? statisticsService = null)
     {
+        _statisticsService = statisticsService;
         ResetGame();
     }
 
     public void ResetGame()
     {
-        IsGameWon  = false;
+        IsGameWon = false;
         IsGameLost = false;
 
         _currentRow = 0;
         _currentCol = 0;
+        _gameStartTime = DateTime.Now;
 
         Tiles = Enumerable.Range(0, Rows)
             .Select(_ => Enumerable.Range(0, Cols).Select(_ => new TileModel()).ToArray())
@@ -48,7 +55,7 @@ public class WordleGameService
 
     public void AddLetter(char letter)
     {
-        if (IsBlocked() || _currentCol >= Cols) 
+        if (IsBlocked() || _currentCol >= Cols)
             return;
 
         // Verhindere Eingabe von ausgegrauten Buchstaben
@@ -57,7 +64,7 @@ public class WordleGameService
             return;
 
         Tiles[_currentRow][_currentCol].Letter = letter;
-        Tiles[_currentRow][_currentCol].State  = TileState.Filled;
+        Tiles[_currentRow][_currentCol].State = TileState.Filled;
         _currentCol++;
 
         NotifyStateChanged();
@@ -66,7 +73,7 @@ public class WordleGameService
 
     public void Backspace()
     {
-        if (IsBlocked() || _currentCol <= 0) 
+        if (IsBlocked() || _currentCol <= 0)
             return;
 
         _currentCol--;
@@ -76,9 +83,9 @@ public class WordleGameService
         NotifyStateChanged();
     }
 
-    public void SubmitGuess()
+    public async void SubmitGuess()
     {
-        if (IsBlocked() || _currentCol < Cols) 
+        if (IsBlocked() || _currentCol < Cols)
             return; // nur wenn 5 Buchstaben
 
         var guess = new string(Tiles[_currentRow].Select(t => t.Letter ?? ' ').ToArray()).ToUpperInvariant();
@@ -88,6 +95,7 @@ public class WordleGameService
         if (guess == TargetWord)
         {
             IsGameWon = true;
+            await SaveGameResultAsync();
             NotifyStateChanged();
             return;
         }
@@ -98,6 +106,7 @@ public class WordleGameService
         if (_currentRow >= Rows)
         {
             IsGameLost = true;
+            await SaveGameResultAsync();
         }
 
         NotifyStateChanged();
@@ -195,4 +204,23 @@ public class WordleGameService
     }
 
     private void NotifyStateChanged() => OnStateChanged?.Invoke();
+
+    /// <summary>
+    /// Saves the current game result to the database
+    /// </summary>
+    private async Task SaveGameResultAsync()
+    {
+        if (_statisticsService == null)
+            return;
+
+        var gameResult = new GameResult
+        {
+            TargetWord = TargetWord,
+            GuessCount = IsGameWon ? _currentRow + 1 : 0,
+            IsWon = IsGameWon,
+            PlayedAt = _gameStartTime
+        };
+
+        await _statisticsService.SaveGameResultAsync(gameResult);
+    }
 }

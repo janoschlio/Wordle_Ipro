@@ -1,9 +1,102 @@
 @page "/statistics"
-@using BlazorServerApp.Components.Wordle
+@using BlazorServerApp.Services.Statistics
+@using BlazorServerApp.Data.DTOs
+@using BlazorServerApp.Components.Statistics
+@inject StatisticsService StatisticsService
+@rendermode InteractiveServer
 
-<WordleShell>
-    <div class="stats-wrap">
-        <h2 class="stats-title">Statistics</h2>
-        <p class="stats-sub">Coming soon…</p>
-    </div>
-</WordleShell>
+<PageTitle>Statistics - Wordle Pro</PageTitle>
+
+<div class="stats-container">
+    @if (_statistics == null)
+    {
+        <div class="stats-loading">
+            <p>Loading statistics...</p>
+        </div>
+    }
+    else
+    {
+        <header class="stats-header">
+            <h2 class="stats-title">Your Performance</h2>
+            <div class="stats-badge">
+                <span class="badge-text">Personal Dashboard</span>
+                <div class="badge-dot"></div>
+            </div>
+        </header>
+
+        <div class="stats-cards">
+            <div class="stat-card">
+                <p class="stat-label">Games Played</p>
+                <div class="stat-value-group">
+                    <span class="stat-value">@_statistics.GamesPlayed</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <p class="stat-label">Efficiency (Avg. Guesses)</p>
+                <div class="stat-value-group">
+                    <span class="stat-value">@_statistics.AverageGuesses.ToString("F1")</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <p class="stat-label">Current Streak</p>
+                <div class="stat-value-group">
+                    <span class="stat-value">@_statistics.CurrentStreak</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <p class="stat-label">Max Streak</p>
+                <div class="stat-value-group">
+                    <span class="stat-value">@_statistics.MaxStreak</span>
+                    <span class="stat-subtext">Days</span>
+                </div>
+            </div>
+        </div>
+
+        <section class="distribution-section">
+            <div class="section-header">
+                <div>
+                    <h3 class="section-title">Guess Distribution</h3>
+                    <p class="section-subtitle">Historical frequency of wins based on attempt count</p>
+                </div>
+            </div>
+
+            <div class="distribution-chart">
+                <GuessDistributionChart Distribution="_statistics.GuessDistribution"/>
+            </div>
+        </section>
+
+        <div class="bottom-sections">
+            <div class="recent-section">
+                <h4 class="small-section-title">Recent Performance</h4>
+                <div class="recent-badges">
+                    @foreach (var result in _statistics.RecentResults.Take(7))
+                    {
+                        <div class="result-badge @(result.IsWon ? "result-win" : "result-loss")">
+                            @(result.IsWon ? "W" : "L")
+                        </div>
+                    }
+                </div>
+                <p class="recent-summary">
+                    @{
+                        var recentWins = _statistics.RecentResults.Take(7).Count(r => r.IsWon);
+                        var recentGames = _statistics.RecentResults.Take(7).Count();
+                    }
+                    @recentWins wins in last @recentGames games
+                </p>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private StatisticsDto? _statistics;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _statistics = await StatisticsService.GetStatisticsAsync();
+    }
+
+}

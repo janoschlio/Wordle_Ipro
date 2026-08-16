@@ -1,0 +1,260 @@
+/* ============================================
+   Statistics Page Styles
+   Matching the Wordle Pro mockup design
+   ============================================ */
+
+.stats-container {
+    max-width: 80rem;
+    /* 1280px */
+    margin: 0 auto;
+    width: 100%;
+    padding: 2rem;
+}
+
+.stats-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    color: var(--text-muted);
+}
+
+/* ========== Header ========== */
+.stats-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+}
+
+.stats-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.025em;
+    margin: 0;
+}
+
+.stats-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.badge-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.badge-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+}
+
+/* ========== Statistics Cards ========== */
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    padding: 1.5rem;
+    border-radius: var(--radius-xl);
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0 0 0.25rem 0;
+}
+
+.stat-value-group {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.stat-icon {
+    font-size: 1.25rem;
+}
+
+.stat-subtext {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* ========== Distribution Section ========== */
+.distribution-section {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.section-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ========== Chart ========== */
+.distribution-chart {
+    position: relative;
+    width: 100%;
+}
+
+.chart-svg {
+    width: 100%;
+    height: 16rem;
+    margin-bottom: 1rem;
+}
+
+.chart-labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0.5rem;
+}
+
+.chart-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.label-tries {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+    color: var(--text-muted);
+}
+
+.label-percent {
+    font-size: 0.625rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+.label-highlight {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+/* ========== Bottom Sections ========== */
+.bottom-sections {
+    display: flex;
+    gap: 1rem;
+}
+
+.recent-section {
+    flex: 1;
+    border-top: 1px solid var(--border-primary);
+    padding-top: 1.5rem;
+}
+
+.small-section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 0 0 1rem 0;
+}
+
+.recent-badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.result-badge {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.result-win {
+    background-color: var(--color-tile-correct);
+}
+
+.result-loss {
+    background-color: var(--color-tile-absent);
+}
+
+.recent-summary {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0;
+}
+
+/* ========== Responsive Design ========== */
+@media (max-width: 768px) {
+    .stats-container {
+        padding: 1rem;
+    }
+
+    .stats-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stats-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .chart-svg {
+        height: 12rem;
+    }
+
+    .label-tries {
+        font-size: 0.625rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-cards {
+        grid-template-columns: 1fr;
+    }
+}

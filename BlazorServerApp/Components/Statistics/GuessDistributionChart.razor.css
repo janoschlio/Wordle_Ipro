@@ -1,0 +1,99 @@
+.distribution-chart {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 1rem;
+    width: 100%;
+    height: 15rem;
+    padding-bottom: 0.5rem;
+}
+
+.chart-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    height: 100%;
+    flex: 1;
+}
+
+.guess-label {
+    text-align: center;
+    font-weight: bold;
+    color: var(--color-tone-1);
+    font-size: 0.9rem;
+}
+
+.bar-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.bar {
+    width: 50%;
+    min-height: 7%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: revealUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Stagger animation for each column */
+.chart-column:nth-child(1) .bar {
+    animation-delay: 0.1s;
+}
+
+.chart-column:nth-child(2) .bar {
+    animation-delay: 0.2s;
+}
+
+.chart-column:nth-child(3) .bar {
+    animation-delay: 0.3s;
+}
+
+.chart-column:nth-child(4) .bar {
+    animation-delay: 0.4s;
+}
+
+.chart-column:nth-child(5) .bar {
+    animation-delay: 0.5s;
+}
+
+.chart-column:nth-child(6) .bar {
+    animation-delay: 0.6s;
+}
+
+@keyframes revealUp {
+    0% {
+        clip-path: inset(100% 0 0 0);
+        opacity: 0;
+    }
+
+    100% {
+        clip-path: inset(0 0 0 0);
+        opacity: 1;
+    }
+}
+
+.bar-fill {
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-tile-absent);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-tone-1);
+    font-weight: bold;
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+}
+
+.bar.has-data .bar-fill {
+    background-color: var(--color-tile-correct);
+    color: white;
+}

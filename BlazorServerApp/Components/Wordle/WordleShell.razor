@@ -3,83 +3,52 @@
 @using BlazorServerApp.Services.Wordle
 @implements IDisposable
 
-<div tabindex="0" class="key-capture" @onkeydown="HandlePhysicalKeyDown">
-    <div class="wordle-app">
-        <aside class="wordle-aside">
-            <div>
-                <div class="brand">
-                    <div class="brand-badge">
-                        <img src="GPTWordleIcon.png" alt="Wordle Icon" class="brand-icon"/>
-                    </div>
-                    <div>
-                        <div class="brand-title">Wordle Pro</div>
-                        <div class="brand-sub">Infinite Play</div>
-                    </div>
-                </div>
+<div tabindex="0" class="key-capture" @onkeydown="HandlePhysicalKeyDown" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; outline: none;">
+    <header class="wordle-header">
+        <div class="header-inner">
+            <h1 class="wordle-title">WORDLE</h1>
+            <GameRulesPopover AriaLabel="How to play">
+                <h3>How to play</h3>
+                <ul>
+                    <li>Guess the hidden <b>5-letter word</b> in <b>6 tries</b>.</li>
+                    <li>Each guess must be a <b>valid 5-letter word</b>.</li>
+                    <li>Press <b>Enter</b> to submit your guess.</li>
+                    <li>Use <b>Backspace</b> to delete a letter.</li>
+                </ul>
 
-                <nav class="nav">
-                    <a href="/">
-                        <span class="material-symbols-outlined">videogame_asset</span>
-                        <span>Game</span>
-                    </a>
+                <h3>Tile colors</h3>
+                <ul>
+                    <li><span class="dot correct"></span> <b>Green</b>: correct letter, correct spot.</li>
+                    <li><span class="dot present"></span> <b>Yellow</b>: correct letter, wrong spot.</li>
+                    <li><span class="dot absent"></span> <b>Gray</b>: not in the word.</li>
+                </ul>
 
-                    <a href="/statistics">
-                        <span class="material-symbols-outlined">leaderboard</span>
-                        <span>Statistics</span>
-                    </a>
-                </nav>
-            </div>
-            <div></div>
-        </aside>
-        
-        <main class="wordle-main">
-            <header class="wordle-header">
-                <div class="header-inner">
-                    <h1 class="wordle-title">WORDLE</h1>
-                    <GameRulesPopover AriaLabel="How to play">
-                        <h3>How to play</h3>
-                        <ul>
-                            <li>Guess the hidden <b>5-letter word</b> in <b>6 tries</b>.</li>
-                            <li>Each guess must be a <b>valid 5-letter word</b>.</li>
-                            <li>Press <b>Enter</b> to submit your guess.</li>
-                            <li>Use <b>Backspace</b> to delete a letter.</li>
-                        </ul>
+                <h3>Repeated letters</h3>
+                <p>If a letter appears multiple times, tiles are colored based on how many times that letter
+                    occurs in the hidden word.</p>
+            </GameRulesPopover>
+            <ThemeToggle />
+        </div>
+    </header>
 
-                        <h3>Tile colors</h3>
-                        <ul>
-                            <li><span class="dot correct"></span> <b>Green</b>: correct letter, correct spot.</li>
-                            <li><span class="dot present"></span> <b>Yellow</b>: correct letter, wrong spot.</li>
-                            <li><span class="dot absent"></span> <b>Gray</b>: not in the word.</li>
-                        </ul>
+    @if (ChildContent is null)
+    {
+        <div class="board-wrap">
+            <WordleBoard Tiles="Tiles"/>
+        </div>
 
-                        <h3>Repeated letters</h3>
-                        <p>If a letter appears multiple times, tiles are colored based on how many times that letter
-                            occurs in the hidden word.</p>
-                    </GameRulesPopover>
-                    <ThemeToggle />
-                </div>
-            </header>
+        <div class="keyboard">
+            <WordleKeyboard Keys="Keys" OnKeyPressed="HandleVirtualKey"/>
+        </div>
 
-            @if (ChildContent is null)
-            {
-                <div class="board-wrap">
-                    <WordleBoard Tiles="Tiles"/>
-                </div>
-
-                <div class="keyboard">
-                    <WordleKeyboard Keys="Keys" OnKeyPressed="HandleVirtualKey"/>
-                </div>
-
-                <WordleLegend/>
-            }
-            else
-            {
-                @ChildContent
-            }
-        </main>
-        <WinModal IsOpen="showWin" Word="@TargetWord" OnPlayAgain="ResetGame" />
-        <LoseModal IsOpen="showLose" Word="@TargetWord" OnTryAgain="ResetGame" />
-    </div>
+        <WordleLegend/>
+    }
+    else
+    {
+        @ChildContent
+    }
+    <WinModal IsOpen="showWin" Word="@TargetWord" OnPlayAgain="ResetGame" />
+    <LoseModal IsOpen="showLose" Word="@TargetWord" OnTryAgain="ResetGame" />
 </div>
 
 @code {

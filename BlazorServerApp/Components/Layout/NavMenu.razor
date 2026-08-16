@@ -1,18 +1,23 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">BlazorServerApp</a>
-    </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="wordle" Match="NavLinkMatch.All">
-                <span class="oi oi-grid-three-up" aria-hidden="true"></span> Wordle
-            </NavLink>
+﻿<div>
+    <div class="brand">
+        <div class="brand-badge">
+            <img src="GPTWordleIcon.png" alt="Wordle Icon" class="brand-icon"/>
         </div>
+        <div>
+            <div class="brand-title">Wordle Pro</div>
+            <div class="brand-sub">Infinite Play</div>
+        </div>
+    </div>
+
+    <nav class="nav">
+        <NavLink href="" Match="NavLinkMatch.All">
+            <span class="material-symbols-outlined">videogame_asset</span>
+            <span>Game</span>
+        </NavLink>
+
+        <NavLink href="statistics">
+            <span class="material-symbols-outlined">leaderboard</span>
+            <span>Statistics</span>
+        </NavLink>
     </nav>
 </div>
-

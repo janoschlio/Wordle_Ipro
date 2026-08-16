@@ -1,0 +1,30 @@
+@using System.Linq
+
+<div class="distribution-chart">
+    @if (Distribution != null)
+    {
+        var maxCount = Distribution.Values.DefaultIfEmpty(0).Max();
+        
+        @foreach (var guess in Enumerable.Range(1, 6))
+        {
+            var count = Distribution.ContainsKey(guess) ? Distribution[guess] : 0;
+            var heightPercentage = maxCount > 0 ? (double)count / maxCount * 100 : 0;
+            // Ensure a minimum height for the bar if it has a count, so text fits or it's visible
+            var displayHeight = Math.Max(heightPercentage, 7); 
+            
+            <div class="chart-column">
+                <div class="bar-container">
+                    <div class="bar @(count > 0 ? "has-data" : "")" style="height: @displayHeight%;">
+                        <div class="bar-fill">@count</div>
+                    </div>
+                </div>
+                <div class="guess-label">@guess</div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Dictionary<int, int> Distribution { get; set; } = new();
+}
