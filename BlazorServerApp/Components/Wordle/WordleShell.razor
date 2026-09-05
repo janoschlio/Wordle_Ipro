@@ -7,27 +7,26 @@
     <header class="wordle-header">
         <div class="header-inner">
             <h1 class="wordle-title">WORDLE</h1>
-            <GameRulesPopover AriaLabel="How to play">
-                <h3>How to play</h3>
+            <GameRulesPopover AriaLabel="Spielanleitung">
+                <h3>Spielanleitung</h3>
                 <ul>
-                    <li>Guess the hidden <b>5-letter word</b> in <b>6 tries</b>.</li>
-                    <li>Each guess must be a <b>valid 5-letter word</b>.</li>
-                    <li>Press <b>Enter</b> to submit your guess.</li>
-                    <li>Use <b>Backspace</b> to delete a letter.</li>
+                    <li>Errate das versteckte <b>Wort aus 5 Buchstaben</b> in <b>6 Versuchen</b>.</li>
+                    <li>Jeder Versuch muss ein <b>gültiges Wort aus 5 Buchstaben</b> sein.</li>
+                    <li>Drücke <b>Enter</b>, um deinen Versuch abzuschicken.</li>
+                    <li>Mit <b>Backspace</b> löschst du einen Buchstaben.</li>
                 </ul>
 
-                <h3>Tile colors</h3>
+                <h3>Farben der Kacheln</h3>
                 <ul>
-                    <li><span class="dot correct"></span> <b>Green</b>: correct letter, correct spot.</li>
-                    <li><span class="dot present"></span> <b>Yellow</b>: correct letter, wrong spot.</li>
-                    <li><span class="dot absent"></span> <b>Gray</b>: not in the word.</li>
+                    <li><span class="dot correct"></span> <b>Grün</b>: richtiger Buchstabe an der richtigen Stelle.</li>
+                    <li><span class="dot present"></span> <b>Gelb</b>: richtiger Buchstabe an der falschen Stelle.</li>
+                    <li><span class="dot absent"></span> <b>Grau</b>: Buchstabe kommt im Wort nicht vor.</li>
                 </ul>
 
-                <h3>Repeated letters</h3>
-                <p>If a letter appears multiple times, tiles are colored based on how many times that letter
-                    occurs in the hidden word.</p>
+                <h3>Mehrfache Buchstaben</h3>
+                <p>Kommt ein Buchstabe mehrfach vor, richtet sich die Färbung danach, wie oft er im
+                    gesuchten Wort tatsächlich enthalten ist.</p>
             </GameRulesPopover>
-            <ThemeToggle />
         </div>
     </header>
 

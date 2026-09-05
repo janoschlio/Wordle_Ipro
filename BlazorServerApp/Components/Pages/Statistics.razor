@@ -5,52 +5,52 @@
 @inject StatisticsService StatisticsService
 @rendermode InteractiveServer
 
-<PageTitle>Statistics - Wordle Pro</PageTitle>
+<PageTitle>Statistik - Wordle Pro</PageTitle>
 
 <div class="stats-container">
     @if (_statistics == null)
     {
         <div class="stats-loading">
-            <p>Loading statistics...</p>
+            <p>Statistik wird geladen...</p>
         </div>
     }
     else
     {
         <header class="stats-header">
-            <h2 class="stats-title">Your Performance</h2>
+            <h2 class="stats-title">Deine Leistung</h2>
             <div class="stats-badge">
-                <span class="badge-text">Personal Dashboard</span>
+                <span class="badge-text">Persönliche Übersicht</span>
                 <div class="badge-dot"></div>
             </div>
         </header>
 
         <div class="stats-cards">
             <div class="stat-card">
-                <p class="stat-label">Games Played</p>
+                <p class="stat-label">Gespielte Runden</p>
                 <div class="stat-value-group">
                     <span class="stat-value">@_statistics.GamesPlayed</span>
                 </div>
             </div>
 
             <div class="stat-card">
-                <p class="stat-label">Efficiency (Avg. Guesses)</p>
+                <p class="stat-label">Effizienz (Ø Versuche)</p>
                 <div class="stat-value-group">
                     <span class="stat-value">@_statistics.AverageGuesses.ToString("F1")</span>
                 </div>
             </div>
 
             <div class="stat-card">
-                <p class="stat-label">Current Streak</p>
+                <p class="stat-label">Aktuelle Serie</p>
                 <div class="stat-value-group">
                     <span class="stat-value">@_statistics.CurrentStreak</span>
                 </div>
             </div>
 
             <div class="stat-card">
-                <p class="stat-label">Max Streak</p>
+                <p class="stat-label">Längste Serie</p>
                 <div class="stat-value-group">
                     <span class="stat-value">@_statistics.MaxStreak</span>
-                    <span class="stat-subtext">Days</span>
+                    <span class="stat-subtext">Tage</span>
                 </div>
             </div>
         </div>
@@ -58,8 +58,8 @@
         <section class="distribution-section">
             <div class="section-header">
                 <div>
-                    <h3 class="section-title">Guess Distribution</h3>
-                    <p class="section-subtitle">Historical frequency of wins based on attempt count</p>
+                    <h3 class="section-title">Verteilung der Versuche</h3>
+                    <p class="section-subtitle">Häufigkeit der Siege nach Anzahl benötigter Versuche</p>
                 </div>
             </div>
 
@@ -70,12 +70,12 @@
 
         <div class="bottom-sections">
             <div class="recent-section">
-                <h4 class="small-section-title">Recent Performance</h4>
+                <h4 class="small-section-title">Letzte Runden</h4>
                 <div class="recent-badges">
                     @foreach (var result in _statistics.RecentResults.Take(7))
                     {
                         <div class="result-badge @(result.IsWon ? "result-win" : "result-loss")">
-                            @(result.IsWon ? "W" : "L")
+                            @(result.IsWon ? "S" : "N")
                         </div>
                     }
                 </div>
@@ -84,7 +84,7 @@
                         var recentWins = _statistics.RecentResults.Take(7).Count(r => r.IsWon);
                         var recentGames = _statistics.RecentResults.Take(7).Count();
                     }
-                    @recentWins wins in last @recentGames games
+                    @recentWins Siege in den letzten @recentGames Runden
                 </p>
             </div>
         </div>

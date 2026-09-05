@@ -18,6 +18,7 @@ Das Projekt folgt einem strukturierten Entwicklungsplan mit 6 Milestones: [Miles
 - **Backend:** ASP.NET Core
 - **ORM:** Entity Framework Core
 - **Datenbank:** SQLite (Datei `wordle.db`, wird beim Start automatisch angelegt)
+- **Sprache der Oberfläche:** durchgehend Deutsch (Kultur fest auf `de-CH`)
 - **Deployment:** Render.com (Docker)
 - **Containerisierung:** Docker
 
@@ -91,7 +92,7 @@ Wordle_Ipro/
 ├── BlazorServerApp/        # Hauptanwendung
 │   ├── Components/
 │   │   ├── Layout/         # Layout-Komponenten
-│   │   ├── Pages/          # Seiten/Routen (Game, Statistics, Words)
+│   │   ├── Pages/          # Seiten/Routen (Spiel, Statistik, Wörter)
 │   │   ├── Statistics/     # Statistik-Komponenten
 │   │   └── Wordle/         # Spielbrett, Tastatur, Modals
 │   ├── Data/
@@ -124,7 +125,7 @@ jedem Neustart wieder überschrieben.
 
 ### Eigene Liste laden
 
-Über die Seite **Words** lässt sich eine eigene Liste einfügen oder als
+Über die Seite **Wörter** lässt sich eine eigene Liste einfügen oder als
 `.txt`-Datei hochladen, wahlweise ergänzend oder als Ersatz der bestehenden.
 
 Regeln für den Import:
@@ -144,6 +145,17 @@ Nach dem Import meldet die Seite zurück, wie viele Wörter hinzugefügt,
 > **Auf Render Free beachten:** Eine hochgeladene Liste liegt in der SQLite-Datei
 > und ist nach einem Neustart des Containers weg. Dauerhafte Änderungen gehören
 > deshalb in `words.txt` und werden mit dem nächsten Deployment ausgerollt.
+
+## 🎨 Design (Hell/Dunkel)
+
+Der Umschalter sitzt unten in der Seitenleiste und ist damit auf jeder Seite
+erreichbar. Die Auswahl liegt im `localStorage`; ohne gespeicherte Auswahl gilt
+die Systemeinstellung.
+
+Angewendet wird das Theme durch ein Inline-Skript im `<head>` von
+[`App.razor`](./BlazorServerApp/Components/App.razor). Das ist Absicht: liefe es
+erst beim Rendern einer Komponente, würde beim Laden kurz das falsche Theme
+aufblitzen.
 
 ## 🎮 Spielregeln
 

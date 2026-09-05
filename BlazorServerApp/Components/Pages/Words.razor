@@ -4,36 +4,36 @@
 @inject WordListService WordListService
 @rendermode InteractiveServer
 
-<PageTitle>Words - Wordle Pro</PageTitle>
+<PageTitle>Wörter - Wordle Pro</PageTitle>
 
 <div class="words-container">
     <header class="words-header">
         <div>
-            <h2 class="words-title">Word List</h2>
+            <h2 class="words-title">Wortliste</h2>
             <p class="words-subtitle">
-                The game draws its hidden word at random from this list.
+                Das Spiel zieht sein Lösungswort zufällig aus dieser Liste.
             </p>
         </div>
         <div class="words-count">
             <span class="words-count-value">@_wordCount</span>
-            <span class="words-count-label">words</span>
+            <span class="words-count-label">Wörter</span>
         </div>
     </header>
 
     <section class="words-panel">
-        <h3 class="words-section-title">Import your own list</h3>
+        <h3 class="words-section-title">Eigene Liste importieren</h3>
         <p class="words-hint">
-            One word per line &mdash; commas, semicolons and spaces work as
-            separators too. Lines starting with <code>#</code> are ignored.
-            Every word must have exactly @WordListService.WordLength letters
-            from A&ndash;Z. Words containing umlauts are rejected, because the
-            on-screen keyboard has no keys for them.
+            Ein Wort pro Zeile &mdash; Kommas, Semikolons und Leerzeichen funktionieren
+            ebenfalls als Trennzeichen. Zeilen, die mit <code>#</code> beginnen, werden
+            ignoriert. Jedes Wort muss genau @WordListService.WordLength Buchstaben von
+            A&ndash;Z haben. Wörter mit Umlauten werden abgelehnt, da die
+            Bildschirmtastatur keine Umlaut-Tasten hat.
         </p>
 
         <div class="words-upload">
             <label class="words-file-label">
                 <span class="material-symbols-outlined">upload_file</span>
-                <span>@(_fileName ?? "Choose a .txt file")</span>
+                <span>@(_fileName ?? ".txt-Datei auswählen")</span>
                 <InputFile OnChange="HandleFileSelected" accept=".txt" class="words-file-input"/>
             </label>
         </div>
@@ -50,14 +50,14 @@
                        name="import-mode"
                        checked="@(!_replaceExisting)"
                        @onchange="@(() => _replaceExisting = false)"/>
-                <span>Add to current list</span>
+                <span>Zur bestehenden Liste hinzufügen</span>
             </label>
             <label class="words-radio">
                 <input type="radio"
                        name="import-mode"
                        checked="@_replaceExisting"
                        @onchange="@(() => _replaceExisting = true)"/>
-                <span>Replace current list</span>
+                <span>Bestehende Liste ersetzen</span>
             </label>
         </div>
 
@@ -65,12 +65,12 @@
             <button class="words-btn words-btn-primary"
                     disabled="@(_isBusy || string.IsNullOrWhiteSpace(_input))"
                     @onclick="ImportAsync">
-                @(_isBusy ? "Importing..." : "Import")
+                @(_isBusy ? "Wird importiert..." : "Importieren")
             </button>
             <button class="words-btn words-btn-ghost"
                     disabled="@_isBusy"
                     @onclick="ClearInput">
-                Clear
+                Leeren
             </button>
         </div>
 
@@ -87,22 +87,22 @@
                 <span class="material-symbols-outlined">check_circle</span>
                 <div>
                     <p class="words-result-main">
-                        @_result.Added @(_result.Added == 1 ? "word" : "words")
-                        @(_result.Replaced ? "imported (list replaced)" : "added")
-                        &mdash; @_result.TotalAfterImport in total.
+                        @_result.Added @(_result.Added == 1 ? "Wort" : "Wörter")
+                        @(_result.Replaced ? "importiert (Liste ersetzt)" : "hinzugefügt")
+                        &mdash; insgesamt @_result.TotalAfterImport.
                     </p>
                     @if (_result.Duplicates > 0 || _result.Rejected > 0)
                     {
                         <p class="words-result-detail">
                             @if (_result.Duplicates > 0)
                             {
-                                <span>@_result.Duplicates skipped as duplicates. </span>
+                                <span>@_result.Duplicates als Duplikate übersprungen. </span>
                             }
                             @if (_result.Rejected > 0)
                             {
                                 <span>
-                                    @_result.Rejected rejected as invalid
-                                    (e.g. @string.Join(", ", _result.RejectedSamples)).
+                                    @_result.Rejected als ungültig abgelehnt
+                                    (z.B. @string.Join(", ", _result.RejectedSamples)).
                                 </span>
                             }
                         </p>
@@ -113,13 +113,13 @@
     </section>
 
     <section class="words-panel">
-        <h3 class="words-section-title">Current list</h3>
+        <h3 class="words-section-title">Aktuelle Liste</h3>
 
         @if (_words.Count == 0)
         {
             <p class="words-hint">
-                The list is empty &mdash; the game falls back to a single fixed
-                word until you import something.
+                Die Liste ist leer &mdash; das Spiel verwendet ein festes Ersatzwort,
+                bis du etwas importierst.
             </p>
         }
         else
@@ -168,7 +168,7 @@
 
         if (file.Size > MaxUploadBytes)
         {
-            _error = $"The file is too large (max {MaxUploadBytes / 1024} KB).";
+            _error = $"Die Datei ist zu gross (maximal {MaxUploadBytes / 1024} KB).";
             _fileName = null;
             return;
         }
@@ -183,7 +183,7 @@
         }
         catch (IOException ex)
         {
-            _error = $"Could not read the file: {ex.Message}";
+            _error = $"Die Datei konnte nicht gelesen werden: {ex.Message}";
             _fileName = null;
         }
     }

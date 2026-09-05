@@ -1,9 +1,14 @@
+using System.Globalization;
 using BlazorServerApp.Components;
 using BlazorServerApp.Data;
 using BlazorServerApp.Services.Statistics;
 using BlazorServerApp.Services.Wordle;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+
+var culture = new CultureInfo("de-CH");
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
 
 var builder = WebApplication.CreateBuilder(args);
 

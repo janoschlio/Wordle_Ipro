@@ -1,8 +1,15 @@
 ﻿@inherits LayoutComponentBase
+@using BlazorServerApp.Components.Shared
 
 <div class="wordle-app">
     <aside class="wordle-aside">
         <NavMenu />
+        <div class="aside-settings">
+            <div class="aside-setting">
+                <span class="aside-setting-label">Design</span>
+                <ThemeToggle />
+            </div>
+        </div>
     </aside>
 
     <main class="wordle-main">

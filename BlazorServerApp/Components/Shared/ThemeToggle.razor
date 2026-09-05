@@ -1,22 +1,13 @@
-@* Theme Toggle Component *@
-<button class="theme-toggle" @onclick="ToggleTheme" aria-label="Toggle theme">
+@inject IJSRuntime JS
+
+<button class="theme-toggle" @onclick="ToggleTheme" aria-label="Zwischen hellem und dunklem Design wechseln">
     <span class="theme-toggle-icon theme-toggle-icon-light material-symbols-outlined">light_mode</span>
     <span class="theme-toggle-icon theme-toggle-icon-dark material-symbols-outlined">dark_mode</span>
 </button>
 
 @code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JS.InvokeVoidAsync("initTheme");
-        }
-    }
-
     private async Task ToggleTheme()
     {
         await JS.InvokeVoidAsync("toggleTheme");
     }
-
-    [Inject] private IJSRuntime JS { get; set; } = default!;
 }

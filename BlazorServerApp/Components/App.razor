@@ -18,6 +18,15 @@
     <ImportMap />
     <link rel="icon" type="image/png" href="GPTWordleIcon.png" />
     <HeadOutlet />
+    
+    <script>
+        (function () {
+            const stored = localStorage.getItem('theme');
+            const theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.style.colorScheme = theme;
+        })();
+    </script>
 </head>
 
 <body>
