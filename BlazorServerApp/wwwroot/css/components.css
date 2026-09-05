@@ -230,3 +230,18 @@
 .help-popover__panel .dot.absent {
     background: var(--color-tile-absent);
 }
+/* ========== Hinweis bei ungueltigem Rateversuch ========== */
+.guess-hint {
+    min-height: 1.25rem;
+    margin: var(--space-md) 0 0;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-error);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.guess-hint-visible {
+    opacity: 1;
+}

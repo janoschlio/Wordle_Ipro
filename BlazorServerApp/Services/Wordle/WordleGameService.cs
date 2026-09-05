@@ -25,6 +25,7 @@ public class WordleGameService
 
     public bool IsGameWon { get; private set; }
     public bool IsGameLost { get; private set; }
+    public bool IsGuessInvalid { get; private set; }
     
     public event Action? OnStateChanged;
 
@@ -49,6 +50,7 @@ public class WordleGameService
     {
         IsGameWon = false;
         IsGameLost = false;
+        IsGuessInvalid = false;
 
         _currentRow = 0;
         _currentCol = 0;
@@ -72,6 +74,14 @@ public class WordleGameService
 
         return string.IsNullOrEmpty(word) ? FallbackWord : word;
     }
+    
+    private async Task<bool> IsAcceptedWordAsync(string guess)
+    {
+        if (_wordListService is null)
+            return true;
+
+        return await _wordListService.ExistsAsync(guess);
+    }
 
     public bool IsBlocked() => IsGameWon || IsGameLost;
 
@@ -84,6 +94,8 @@ public class WordleGameService
         var key = Keys.FirstOrDefault(k => k.Label.Length == 1 && k.Label[0] == letter);
         if (KeyState.Absent == key?.State)
             return;
+
+        IsGuessInvalid = false;
 
         Tiles[_currentRow][_currentCol].Letter = letter;
         Tiles[_currentRow][_currentCol].State = TileState.Filled;
@@ -98,6 +110,8 @@ public class WordleGameService
         if (IsBlocked() || _currentCol <= 0)
             return;
 
+        IsGuessInvalid = false;
+
         _currentCol--;
         Tiles[_currentRow][_currentCol].Letter = null;
         Tiles[_currentRow][_currentCol].State = TileState.Empty;
@@ -109,8 +123,15 @@ public class WordleGameService
     {
         if (IsBlocked() || _currentCol < Cols)
             return; // nur wenn 5 Buchstaben
-
+        
         var guess = new string(Tiles[_currentRow].Select(t => t.Letter ?? ' ').ToArray()).ToUpperInvariant();
+
+        if (!await IsAcceptedWordAsync(guess))
+        {
+            IsGuessInvalid = true;
+            NotifyStateChanged();
+            return;
+        }
 
         EvaluateRow(_currentRow, guess, TargetWord);
 

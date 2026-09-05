@@ -34,6 +34,10 @@
     {
         <div class="board-wrap">
             <WordleBoard Tiles="Tiles"/>
+
+            <p class="guess-hint @(IsGuessInvalid ? "guess-hint-visible" : "")" role="status" aria-live="polite">
+                @(IsGuessInvalid ? "Dieses Wort steht nicht in der Wortliste." : "")
+            </p>
         </div>
 
         <div class="keyboard">
@@ -62,6 +66,7 @@
     private string TargetWord => GameService.TargetWord;
     private bool showWin => GameService.IsGameWon;
     private bool showLose => GameService.IsGameLost;
+    private bool IsGuessInvalid => GameService.IsGuessInvalid;
 
     protected override async Task OnInitializedAsync()
     {

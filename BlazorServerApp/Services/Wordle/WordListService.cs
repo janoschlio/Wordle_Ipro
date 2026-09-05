@@ -35,6 +35,11 @@ public class WordListService
             .ToListAsync();
     }
     
+    public async Task<bool> ExistsAsync(string word)
+    {
+        return await _context.Words.AnyAsync(w => w.Value == word);
+    }
+
     public async Task<string?> GetRandomWordAsync()
     {
         var count = await GetCountAsync();
