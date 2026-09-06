@@ -159,19 +159,26 @@ public class WordleGameService
         NotifyStateChanged();
     }
 
-    // Wordle Bewertung 
-    private void EvaluateRow(int row, string guess, string target)
+    /// <summary>
+    /// Bewertet einen Rateversuch gegen das gesuchte Wort.
+    /// </summary>
+    /// <remarks>
+    /// Bewusst eine reine Funktion ohne Zugriff auf den Spielzustand: die
+    /// Bewertung ist der kniffligste Teil des Spiels (mehrfach vorkommende
+    /// Buchstaben) und laesst sich so isoliert testen.
+    /// </remarks>
+    public static TileState[] EvaluateGuess(string guess, string target)
     {
         var result = new TileState[Cols];
         var remaining = new Dictionary<char, int>();
 
-        // count letters in target
+        // Buchstaben des gesuchten Wortes zaehlen
         foreach (var ch in target)
         {
             remaining[ch] = remaining.TryGetValue(ch, out var c) ? c + 1 : 1;
         }
 
-        // 1) correct pass
+        // 1) Zuerst die exakten Treffer, sie haben Vorrang auf das Kontingent
         for (int i = 0; i < Cols; i++)
         {
             if (guess[i] == target[i])
@@ -181,7 +188,7 @@ public class WordleGameService
             }
         }
 
-        // 2) present/absent pass
+        // 2) Danach der Rest aus dem verbliebenen Kontingent
         for (int i = 0; i < Cols; i++)
         {
             if (result[i] == TileState.Correct) continue;
@@ -198,7 +205,13 @@ public class WordleGameService
             }
         }
 
-        // apply tile states + update key states
+        return result;
+    }
+
+    private void EvaluateRow(int row, string guess, string target)
+    {
+        var result = EvaluateGuess(guess, target);
+
         for (int i = 0; i < Cols; i++)
         {
             Tiles[row][i].State = result[i];
