@@ -1,11 +1,12 @@
 using BlazorServerApp.Data.Models;
-using BlazorServerApp.Services.Wordle;
+using BlazorServerApp.Models.Wordle;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlazorServerApp.Data;
 
 /// <summary>
-/// Database context for Wordle game statistics
+/// Datenbankkontext für die beiden dauerhaften Bestände: die Wortliste und die
+/// gespeicherten Spielergebnisse.
 /// </summary>
 public class WordleDbContext : DbContext
 {
@@ -24,7 +25,7 @@ public class WordleDbContext : DbContext
         modelBuilder.Entity<Word>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Value).IsRequired().HasMaxLength(WordListService.WordLength);
+            entity.Property(e => e.Value).IsRequired().HasMaxLength(WordleRules.WordLength);
             entity.HasIndex(e => e.Value).IsUnique();
         });
 

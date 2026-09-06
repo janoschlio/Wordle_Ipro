@@ -8,15 +8,15 @@ namespace BlazorServerApp.Tests;
 /// </summary>
 public class WordListServiceTests : IDisposable
 {
-    private readonly TestDatabase _db = new();
+    private readonly TestDatabase _datenbank = new();
     private readonly WordListService _dienst;
 
     public WordListServiceTests()
     {
-        _dienst = new WordListService(_db.Context);
+        _dienst = new WordListService(_datenbank.Context);
     }
 
-    public void Dispose() => _db.Dispose();
+    public void Dispose() => _datenbank.Dispose();
 
     [Fact]
     public async Task Import_uebernimmt_gueltige_Woerter()

@@ -3,7 +3,12 @@
 @using BlazorServerApp.Services.Wordle
 @implements IDisposable
 
-<div tabindex="0" class="key-capture" @ref="_keyCapture" @onkeydown="HandlePhysicalKeyDown" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; outline: none;">
+@* tabindex="0" macht das div fokussierbar. Nur so empfaengt es @onkeydown und
+   die physische Tastatur funktioniert -- das ist der Zweck dieses Wrappers. *@
+<div tabindex="0"
+     class="key-capture"
+     @ref="_keyCapture"
+     @onkeydown="HandlePhysicalKeyDown">
     <header class="wordle-header">
         <div class="header-inner">
             <h1 class="wordle-title">WORDLE</h1>
@@ -30,43 +35,55 @@
         </div>
     </header>
 
-    @if (ChildContent is null)
-    {
-        <div class="board-wrap">
-            <WordleBoard Tiles="Tiles"/>
+    <div class="board-wrap">
+        <WordleBoard Tiles="Tiles"/>
 
-            <p class="guess-hint @(IsGuessInvalid ? "guess-hint-visible" : "")" role="status" aria-live="polite">
-                @(IsGuessInvalid ? "Dieses Wort steht nicht in der Wortliste." : "")
-            </p>
-        </div>
+        <p class="guess-hint @HintCssClass" role="status" aria-live="polite">
+            @HintText
+        </p>
+    </div>
 
-        <div class="keyboard">
-            <WordleKeyboard Keys="Keys" OnKeyPressed="HandleVirtualKey"/>
-        </div>
+    <div class="keyboard">
+        <WordleKeyboard Keys="Keys" OnKeyPressed="HandleVirtualKeyPressed"/>
+    </div>
 
-        <WordleLegend/>
-    }
-    else
-    {
-        @ChildContent
-    }
-    <WinModal IsOpen="showWin" Word="@TargetWord" OnPlayAgain="ResetGame" />
-    <LoseModal IsOpen="showLose" Word="@TargetWord" OnTryAgain="ResetGame" />
+    <WordleLegend/>
+
+    <ResultModal IsOpen="IsGameWon" TargetWord="@TargetWord" OnAction="ResetGame"
+                 Variant="ResultVariant.Win" Icon="stars"
+                 Title="Ausgezeichnet!" Subtitle="Du hast das Wort gefunden"
+                 ButtonText="NOCHMAL SPIELEN" />
+
+    <ResultModal IsOpen="IsGameLost" TargetWord="@TargetWord" OnAction="ResetGame"
+                 Variant="ResultVariant.Lose" Icon="sentiment_dissatisfied"
+                 Title="Guter Versuch!" Subtitle="Das Wort war:"
+                 ButtonText="NEUER VERSUCH" />
 </div>
 
 @code {
-    [Parameter] public RenderFragment? ChildContent { get; set; }
     [Inject] private WordleGameService GameService { get; set; } = default!;
 
     private ElementReference _keyCapture;
+
+    /// <summary>
+    /// Nach dem Schliessen eines Modals liegt der Fokus auf dessen Knopf, der
+    /// dann aus dem DOM verschwindet. Ohne erneutes Fokussieren waere die
+    /// physische Tastatur danach wirkungslos.
+    /// </summary>
     private bool _shouldFocus;
 
     private TileModel[][] Tiles => GameService.Tiles;
-    private List<KeyModel> Keys => GameService.Keys;
+    private IReadOnlyList<KeyModel> Keys => GameService.Keys;
     private string TargetWord => GameService.TargetWord;
-    private bool showWin => GameService.IsGameWon;
-    private bool showLose => GameService.IsGameLost;
+    private bool IsGameWon => GameService.IsGameWon;
+    private bool IsGameLost => GameService.IsGameLost;
     private bool IsGuessInvalid => GameService.IsGuessInvalid;
+
+    private string HintText =>
+        IsGuessInvalid ? "Dieses Wort steht nicht in der Wortliste." : "";
+
+    private string HintCssClass =>
+        IsGuessInvalid ? "guess-hint-visible" : "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,28 +106,34 @@
         _shouldFocus = true;
     }
 
-    // ---------- Input: Virtual Keyboard ----------
-    private async Task HandleVirtualKey(string key)
+    private async Task HandleVirtualKeyPressed(string key)
     {
-        await HandleInput(key == "Back" ? "Backspace" : key);
+        // Die Bildschirmtaste ist mit "Back" beschriftet, die physische Taste
+        // meldet sich als "Backspace". Beide Wege sollen dasselbe Vokabular
+        // benutzen, deshalb wird hier uebersetzt.
+        var normalizedKey = key == "Back" ? "Backspace" : key;
+
+        await ApplyKey(normalizedKey);
     }
 
-    // ---------- Input: Physical Keyboard ----------
     private async Task HandlePhysicalKeyDown(KeyboardEventArgs e)
     {
-        await HandleInput(e.Key);
+        await ApplyKey(e.Key);
     }
-    
-    private async Task HandleInput(string key)
-    {
-        if (GameService.IsBlocked()) return;
 
+    /// <summary>Beide Eingabewege laufen hier zusammen.</summary>
+    private async Task ApplyKey(string key)
+    {
         if (key == "Enter")
             await GameService.SubmitGuessAsync();
         else if (key == "Backspace")
             GameService.Backspace();
         else if (key.Length == 1 && char.IsLetter(key[0]))
+        {
+            // char.IsLetter laesst auch Umlaute durch. Die stehen in keiner
+            // Wortliste, der Versuch wird also spaeter ohnehin abgelehnt.
             GameService.AddLetter(char.ToUpperInvariant(key[0]));
+        }
     }
 
     public void Dispose()

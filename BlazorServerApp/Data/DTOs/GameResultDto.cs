@@ -1,3 +1,5 @@
+namespace BlazorServerApp.Data.DTOs;
+
 /// <summary>
 /// Simplified game result for recent performance
 /// </summary>

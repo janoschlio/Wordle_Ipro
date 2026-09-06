@@ -5,7 +5,6 @@
 @using BlazorServerApp.Services.Player
 @inject StatisticsService StatisticsService
 @inject PlayerService PlayerService
-@rendermode InteractiveServer
 
 <PageTitle>Statistik - Wordle Pro</PageTitle>
 
@@ -52,7 +51,7 @@
                 <p class="stat-label">Längste Serie</p>
                 <div class="stat-value-group">
                     <span class="stat-value">@_statistics.MaxStreak</span>
-                    <span class="stat-subtext">Tage</span>
+                    <span class="stat-subtext">Runden</span>
                 </div>
             </div>
         </div>
@@ -65,28 +64,26 @@
                 </div>
             </div>
 
-            <div class="distribution-chart">
-                <GuessDistributionChart Distribution="_statistics.GuessDistribution"/>
-            </div>
+            <GuessDistributionChart Distribution="_statistics.GuessDistribution"/>
         </section>
 
-        <div class="bottom-sections">
+        <div class="recent-section-wrapper">
             <div class="recent-section">
                 <h4 class="small-section-title">Letzte Runden</h4>
                 <div class="recent-badges">
-                    @foreach (var result in _statistics.RecentResults.Take(7))
+                    @foreach (var result in _statistics.RecentResults)
                     {
                         <div class="result-badge @(result.IsWon ? "result-win" : "result-loss")">
                             @(result.IsWon ? "S" : "N")
                         </div>
                     }
                 </div>
+                @{
+                    var winCount = _statistics.RecentResults.Count(game => game.IsWon);
+                    var roundCount = _statistics.RecentResults.Count;
+                }
                 <p class="recent-summary">
-                    @{
-                        var recentWins = _statistics.RecentResults.Take(7).Count(r => r.IsWon);
-                        var recentGames = _statistics.RecentResults.Take(7).Count();
-                    }
-                    @recentWins Siege in den letzten @recentGames Runden
+                    @winCount Siege in den letzten @roundCount Runden
                 </p>
             </div>
         </div>

@@ -12,17 +12,17 @@ public class StatisticsServiceTests : IDisposable
     private const string SpielerA = "spieler-a";
     private const string SpielerB = "spieler-b";
 
-    private readonly TestDatabase _db = new();
+    private readonly TestDatabase _datenbank = new();
     private readonly StatisticsService _dienst;
 
     private DateTime _zeitpunkt = new(2026, 1, 1, 12, 0, 0);
 
     public StatisticsServiceTests()
     {
-        _dienst = new StatisticsService(_db.Context);
+        _dienst = new StatisticsService(_datenbank.Context);
     }
 
-    public void Dispose() => _db.Dispose();
+    public void Dispose() => _datenbank.Dispose();
 
     /// <summary>Legt ein Spielergebnis an; jedes weitere liegt eine Stunde spaeter.</summary>
     private async Task SpielAnlegen(string spielerId, bool gewonnen, int versuche)
@@ -96,7 +96,8 @@ public class StatisticsServiceTests : IDisposable
         await SpielAnlegen(SpielerA, gewonnen: true, versuche: 5);
 
         // Act
-        var verteilung = (await _dienst.GetStatisticsAsync(SpielerA)).GuessDistribution;
+        var statistik = await _dienst.GetStatisticsAsync(SpielerA);
+        var verteilung = statistik.GuessDistribution;
 
         // Assert
         Assert.Equal(2, verteilung[3]);
@@ -110,7 +111,8 @@ public class StatisticsServiceTests : IDisposable
         // Arrange: bewusst ohne Spiele, die Verteilung muss trotzdem vollstaendig sein
 
         // Act
-        var verteilung = (await _dienst.GetStatisticsAsync(SpielerA)).GuessDistribution;
+        var statistik = await _dienst.GetStatisticsAsync(SpielerA);
+        var verteilung = statistik.GuessDistribution;
 
         // Assert
         Assert.Equal(6, verteilung.Count);
@@ -159,7 +161,8 @@ public class StatisticsServiceTests : IDisposable
         await SpielAnlegen(SpielerA, gewonnen: false, versuche: 0);
 
         // Act
-        var letzte = (await _dienst.GetStatisticsAsync(SpielerA)).RecentResults;
+        var statistik = await _dienst.GetStatisticsAsync(SpielerA);
+        var letzte = statistik.RecentResults;
 
         // Assert
         Assert.Equal(2, letzte.Count);

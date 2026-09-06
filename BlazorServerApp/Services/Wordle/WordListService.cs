@@ -1,14 +1,13 @@
 using BlazorServerApp.Data;
 using BlazorServerApp.Data.DTOs;
 using BlazorServerApp.Data.Models;
+using BlazorServerApp.Models.Wordle;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlazorServerApp.Services.Wordle;
 
 public class WordListService
 {
-    public const int WordLength = 5;
-    
     private const string DefaultWordListPath = "Data/words.txt";
     
     private const int MaxRejectedSamples = 5;
@@ -34,7 +33,7 @@ public class WordListService
             .Select(w => w.Value)
             .ToListAsync();
     }
-    
+
     public async Task<bool> ExistsAsync(string word)
     {
         return await _context.Words.AnyAsync(w => w.Value == word);
@@ -47,7 +46,7 @@ public class WordListService
             return null;
 
         var index = Random.Shared.Next(count);
-
+        
         return await _context.Words
             .OrderBy(w => w.Id)
             .Skip(index)
@@ -83,18 +82,31 @@ public class WordListService
         {
             await _context.Words.ExecuteDeleteAsync();
         }
-        
-        var existing = await _context.Words
-            .Select(w => w.Value)
-            .ToListAsync();
 
-        var known = new HashSet<string>(existing);
+        var known = new HashSet<string>();
+
+        // Nach dem Leeren ist die Tabelle garantiert leer -- dann sparen wir uns
+        // die Abfrage des bisherigen Bestands.
+        if (!replaceExisting)
+        {
+            var alreadyStored = await _context.Words.Select(word => word.Value).ToListAsync();
+
+            foreach (var word in alreadyStored)
+            {
+                known.Add(word);
+            }
+        }
+
+        var newWords = new List<Word>();
 
         foreach (var word in valid)
         {
-            if (known.Add(word))
+            var isNew = !known.Contains(word);
+
+            if (isNew)
             {
-                _context.Words.Add(new Word { Value = word });
+                known.Add(word);
+                newWords.Add(new Word { Value = word });
                 result.Added++;
             }
             else
@@ -103,8 +115,11 @@ public class WordListService
             }
         }
 
+        _context.Words.AddRange(newWords);
         await _context.SaveChangesAsync();
 
+        // known enthaelt den vorherigen Bestand plus alle neu eingefuegten
+        // Woerter und entspricht damit dem Stand nach dem Import.
         result.TotalAfterImport = known.Count;
 
         return result;
@@ -117,8 +132,7 @@ public class WordListService
 
         if (string.IsNullOrWhiteSpace(rawText))
             return (valid, rejected);
-
-        // Kommentarzeilen entfernen
+        
         var lines = rawText
             .Split('\n')
             .Where(line => !line.TrimStart().StartsWith('#'));
@@ -151,6 +165,6 @@ public class WordListService
     
     private static bool IsValid(string word)
     {
-        return word.Length == WordLength && word.All(c => c is >= 'A' and <= 'Z');
+        return word.Length == WordleRules.WordLength && word.All(c => c is >= 'A' and <= 'Z');
     }
 }

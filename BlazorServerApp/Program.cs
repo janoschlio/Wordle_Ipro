@@ -26,15 +26,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Register Database Context
 builder.Services.AddDbContext<WordleDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("WordleDb")));
 
-// Register Services
 builder.Services.AddScoped<PlayerService>();
 builder.Services.AddScoped<StatisticsService>();
 builder.Services.AddScoped<WordListService>();
@@ -42,7 +39,6 @@ builder.Services.AddScoped<WordleGameService>();
 
 var app = builder.Build();
 
-// Ensure database is created and the default word list is loaded
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<WordleDbContext>();
@@ -57,7 +53,8 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
+// Muss vor UseHttpsRedirection stehen: sonst sieht die Redirect-Middleware das
+// Schema "http" und erzeugt hinter dem Proxy eine Endlosschleife.
 app.UseForwardedHeaders();
 
 if (!app.Environment.IsDevelopment())

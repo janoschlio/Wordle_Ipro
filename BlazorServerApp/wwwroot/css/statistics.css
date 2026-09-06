@@ -136,46 +136,8 @@
     width: 100%;
 }
 
-.chart-svg {
-    width: 100%;
-    height: 16rem;
-    margin-bottom: 1rem;
-}
-
-.chart-labels {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 0.5rem;
-}
-
-.chart-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.label-tries {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: -0.05em;
-    color: var(--text-muted);
-}
-
-.label-percent {
-    font-size: 0.625rem;
-    color: var(--text-muted);
-    margin-top: 0.25rem;
-}
-
-.label-highlight {
-    color: var(--color-primary);
-    font-weight: 700;
-}
-
 /* ========== Bottom Sections ========== */
-.bottom-sections {
+.recent-section-wrapper {
     display: flex;
     gap: 1rem;
 }
@@ -242,14 +204,6 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
-    }
-
-    .chart-svg {
-        height: 12rem;
-    }
-
-    .label-tries {
-        font-size: 0.625rem;
     }
 }
 

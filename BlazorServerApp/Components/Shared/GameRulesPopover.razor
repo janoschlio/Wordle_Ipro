@@ -5,20 +5,13 @@
      @onfocusout="Close">
 
     <button type="button"
-            class="@ButtonClass"
+            class="icon-btn"
             aria-label="@AriaLabel"
             aria-haspopup="true"
             aria-expanded="@_isOpen"
             @onclick="Toggle"
             @onkeydown="HandleKeyDown">
-        @if (!string.IsNullOrWhiteSpace(Icon))
-        {
-            <span class="material-symbols-outlined">@Icon</span>
-        }
-        else
-        {
-            @ButtonText
-        }
+        <span class="material-symbols-outlined">@Icon</span>
     </button>
 
     @if (_isOpen)
@@ -33,9 +26,7 @@
     private bool _isOpen;
 
     [Parameter] public string Icon { get; set; } = "help_outline";
-    [Parameter] public string ButtonText { get; set; } = "?";
     [Parameter] public string AriaLabel { get; set; } = "Help";
-    [Parameter] public string ButtonClass { get; set; } = "icon-btn";
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     private void Open() => _isOpen = true;

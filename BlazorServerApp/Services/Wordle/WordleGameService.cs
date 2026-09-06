@@ -7,8 +7,8 @@ namespace BlazorServerApp.Services.Wordle;
 
 public class WordleGameService
 {
-    private const int Rows = 6;
-    private const int Cols = WordListService.WordLength;
+    private const int RowCount = WordleRules.MaxAttempts;
+    private const int ColumnCount = WordleRules.WordLength;
     
     private const string FallbackWord = "SPIEL";
 
@@ -19,8 +19,10 @@ public class WordleGameService
     public string TargetWord { get; private set; } = FallbackWord;
 
     public TileModel[][] Tiles { get; private set; } = default!;
-    public List<KeyModel> Keys { get; private set; } = default!;
 
+    private readonly KeyboardState _keyboard = new(); 
+    public IReadOnlyList<KeyModel> Keys => _keyboard.Keys;
+    
     private int _currentRow;
     private int _currentCol;
     private DateTime _gameStartTime;
@@ -60,13 +62,19 @@ public class WordleGameService
         _currentCol = 0;
         _gameStartTime = DateTime.Now;
 
-        Tiles = Enumerable.Range(0, Rows)
-            .Select(_ => Enumerable.Range(0, Cols).Select(_ => new TileModel()).ToArray())
-            .ToArray();
+        Tiles = new TileModel[RowCount][];
 
-        Keys = BuildKeyboard().ToList();
+        for (var row = 0; row < RowCount; row++)
+        {
+            Tiles[row] = new TileModel[ColumnCount];
 
-        NotifyStateChanged();
+            for (var column = 0; column < ColumnCount; column++)
+            {
+                Tiles[row][column] = new TileModel();
+            }
+        }
+        
+        _keyboard.Reset();
     }
     
     private async Task<string> PickTargetWordAsync()
@@ -79,25 +87,44 @@ public class WordleGameService
         return string.IsNullOrEmpty(word) ? FallbackWord : word;
     }
     
+    private string ReadCurrentRow()
+    {
+        var letters = new char[ColumnCount];
+
+        for (var column = 0; column < ColumnCount; column++)
+        {
+            letters[column] = Tiles[_currentRow][column].Letter ?? ' ';
+        }
+
+        return new string(letters).ToUpperInvariant();
+    }
+
     private async Task<bool> IsAcceptedWordAsync(string guess)
     {
+        // Ohne Wortliste laesst sich nichts pruefen. Dann wird jeder Versuch
+        // angenommen, sonst waere das Spiel in diesem Fall unspielbar.
         if (_wordListService is null)
+        {
             return true;
+        }
 
         return await _wordListService.ExistsAsync(guess);
     }
-
-    public bool IsBlocked() => IsGameWon || IsGameLost;
+    
+    public bool IsGameOver() => IsGameWon || IsGameLost;
 
     public void AddLetter(char letter)
     {
-        if (IsBlocked() || _currentCol >= Cols)
+        if (IsGameOver() || _currentCol >= ColumnCount)
             return;
-
-        // Verhindere Eingabe von ausgegrauten Buchstaben
-        var key = Keys.FirstOrDefault(k => k.Label.Length == 1 && k.Label[0] == letter);
-        if (KeyState.Absent == key?.State)
+        
+        // Bewusste Abweichung vom Original: Buchstaben, die bereits als nicht
+        // enthalten bekannt sind, lassen sich gar nicht erst eingeben. Das
+        // erspart Versuche, die ohnehin nicht aufgehen koennen.
+        if (_keyboard.IsLetterRuledOut(letter))
+        {
             return;
+        }
 
         IsGuessInvalid = false;
 
@@ -111,7 +138,7 @@ public class WordleGameService
 
     public void Backspace()
     {
-        if (IsBlocked() || _currentCol <= 0)
+        if (IsGameOver() || _currentCol <= 0)
             return;
 
         IsGuessInvalid = false;
@@ -125,10 +152,10 @@ public class WordleGameService
 
     public async Task SubmitGuessAsync()
     {
-        if (IsBlocked() || _currentCol < Cols)
+        if (IsGameOver() || _currentCol < ColumnCount)
             return; // nur wenn 5 Buchstaben
         
-        var guess = new string(Tiles[_currentRow].Select(t => t.Letter ?? ' ').ToArray()).ToUpperInvariant();
+        var guess = ReadCurrentRow();
 
         if (!await IsAcceptedWordAsync(guess))
         {
@@ -150,7 +177,7 @@ public class WordleGameService
         _currentRow++;
         _currentCol = 0;
 
-        if (_currentRow >= Rows)
+        if (_currentRow >= RowCount)
         {
             IsGameLost = true;
             await SaveGameResultAsync();
@@ -158,38 +185,40 @@ public class WordleGameService
 
         NotifyStateChanged();
     }
-
-    /// <summary>
-    /// Bewertet einen Rateversuch gegen das gesuchte Wort.
-    /// </summary>
-    /// <remarks>
-    /// Bewusst eine reine Funktion ohne Zugriff auf den Spielzustand: die
-    /// Bewertung ist der kniffligste Teil des Spiels (mehrfach vorkommende
-    /// Buchstaben) und laesst sich so isoliert testen.
-    /// </remarks>
+    
     public static TileState[] EvaluateGuess(string guess, string target)
     {
-        var result = new TileState[Cols];
+        var result = new TileState[ColumnCount];
         var remaining = new Dictionary<char, int>();
 
-        // Buchstaben des gesuchten Wortes zaehlen
-        foreach (var ch in target)
+        // Kontingent aufbauen: wie oft darf jeder Buchstabe eingefaerbt werden?
+        foreach (var letter in target)
         {
-            remaining[ch] = remaining.TryGetValue(ch, out var c) ? c + 1 : 1;
+            if (remaining.ContainsKey(letter))
+            {
+                remaining[letter]++;
+            }
+            else
+            {
+                remaining[letter] = 1;
+            }
         }
 
         // 1) Zuerst die exakten Treffer, sie haben Vorrang auf das Kontingent
-        for (int i = 0; i < Cols; i++)
+        for (int i = 0; i < ColumnCount; i++)
         {
             if (guess[i] == target[i])
             {
                 result[i] = TileState.Correct;
+
+                // Der Schluessel existiert sicher: guess[i] == target[i], und
+                // jeder Buchstabe des Zielworts steht im Kontingent.
                 remaining[guess[i]]--;
             }
         }
 
         // 2) Danach der Rest aus dem verbliebenen Kontingent
-        for (int i = 0; i < Cols; i++)
+        for (int i = 0; i < ColumnCount; i++)
         {
             if (result[i] == TileState.Correct) continue;
 
@@ -212,55 +241,11 @@ public class WordleGameService
     {
         var result = EvaluateGuess(guess, target);
 
-        for (int i = 0; i < Cols; i++)
+        for (int i = 0; i < ColumnCount; i++)
         {
             Tiles[row][i].State = result[i];
-            UpdateKeyState(guess[i], result[i]);
+            _keyboard.UpdateKeyState(guess[i], result[i]);
         }
-    }
-
-    private void UpdateKeyState(char letter, TileState tileState)
-    {
-        var key = Keys.FirstOrDefault(k => k.Label.Length == 1 && k.Label[0] == letter);
-        if (key is null) return;
-
-        // Priorität: Correct > Present > Absent > Neutral
-        var newState = tileState switch
-        {
-            TileState.Correct => KeyState.Correct,
-            TileState.Present => KeyState.Present,
-            TileState.Absent => KeyState.Absent,
-            _ => key.State
-        };
-
-        key.State = MaxKeyState(key.State, newState);
-    }
-
-    private static KeyState MaxKeyState(KeyState a, KeyState b)
-    {
-        int Rank(KeyState s) => s switch
-        {
-            KeyState.Neutral => 0,
-            KeyState.Absent => 1,
-            KeyState.Present => 2,
-            KeyState.Correct => 3,
-            _ => 0
-        };
-
-        return Rank(b) > Rank(a) ? b : a;
-    }
-
-    private static IReadOnlyList<KeyModel> BuildKeyboard()
-    {
-        var keys = new List<KeyModel>();
-
-        keys.AddRange("QWERTYUIOP".Select(c => new KeyModel { Label = c.ToString() }));
-        keys.AddRange("ASDFGHJKL".Select(c => new KeyModel { Label = c.ToString() }));
-        keys.Add(new KeyModel { Label = "Enter", IsWide = true });
-        keys.AddRange("ZXCVBNM".Select(c => new KeyModel { Label = c.ToString() }));
-        keys.Add(new KeyModel { Label = "Back", IsWide = true, Icon = "backspace" });
-
-        return keys;
     }
 
     private void NotifyStateChanged() => OnStateChanged?.Invoke();
@@ -271,12 +256,14 @@ public class WordleGameService
         // zuordnen, dann wird es gar nicht erst gespeichert.
         if (_statisticsService is null || _playerService is null)
             return;
+        
+        var usedAttempts = IsGameWon ? _currentRow + 1 : 0;
 
         var gameResult = new GameResult
         {
             PlayerId = await _playerService.EnsurePlayerIdAsync(),
             TargetWord = TargetWord,
-            GuessCount = IsGameWon ? _currentRow + 1 : 0,
+            GuessCount = usedAttempts,
             IsWon = IsGameWon,
             PlayedAt = _gameStartTime
         };

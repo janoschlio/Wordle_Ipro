@@ -1,30 +1,49 @@
-@using System.Linq
+@using BlazorServerApp.Models.Wordle
 
 <div class="distribution-chart">
-    @if (Distribution != null)
+    @{
+        var highestCount = HighestCount();
+    }
+
+    @* Bewusst ueber 1..MaxAttempts statt ueber das Dictionary: so erscheinen auch
+       leere Balken, und die Reihenfolge stimmt. Ein Dictionary garantiert keine. *@
+    @foreach (var attempts in Enumerable.Range(1, WordleRules.MaxAttempts))
     {
-        var maxCount = Distribution.Values.DefaultIfEmpty(0).Max();
-        
-        @foreach (var guess in Enumerable.Range(1, 6))
-        {
-            var count = Distribution.ContainsKey(guess) ? Distribution[guess] : 0;
-            var heightPercentage = maxCount > 0 ? (double)count / maxCount * 100 : 0;
-            // Ensure a minimum height for the bar if it has a count, so text fits or it's visible
-            var displayHeight = Math.Max(heightPercentage, 7); 
-            
-            <div class="chart-column">
-                <div class="bar-container">
-                    <div class="bar @(count > 0 ? "has-data" : "")" style="height: @displayHeight%;">
-                        <div class="bar-fill">@count</div>
-                    </div>
+        var count = Distribution.GetValueOrDefault(attempts);
+        var barHeightPercent = BarHeightPercent(count, highestCount);
+
+        <div class="chart-column">
+            <div class="bar-container">
+                <div class="bar @(count > 0 ? "has-data" : "")" style="height: @barHeightPercent%;">
+                    <div class="bar-fill">@count</div>
                 </div>
-                <div class="guess-label">@guess</div>
             </div>
-        }
+            <div class="guess-label">@attempts</div>
+        </div>
     }
 </div>
 
 @code {
-    [Parameter]
-    public Dictionary<int, int> Distribution { get; set; } = new();
+    /// <summary>Anzahl Siege je benoetigter Versuchszahl.</summary>
+    [Parameter] public Dictionary<int, int> Distribution { get; set; } = new();
+
+    /// <summary>
+    /// Der hoechste Balkenwert; er entspricht 100 Prozent Hoehe.
+    /// DefaultIfEmpty faengt den Fall ab, dass noch keine Runde gespielt wurde --
+    /// Max() wuerde auf einer leeren Sammlung eine Ausnahme werfen.
+    /// </summary>
+    private int HighestCount()
+    {
+        return Distribution.Values.DefaultIfEmpty(0).Max();
+    }
+
+    private double BarHeightPercent(int count, int highestCount)
+    {
+        if (highestCount == 0)
+        {
+            return 0;
+        }
+
+        return (double)count / highestCount * 100;
+    }
 }

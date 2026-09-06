@@ -245,3 +245,9 @@
 .guess-hint-visible {
     opacity: 1;
 }
+
+/* Haelt die mittlere Tastaturreihe eingerueckt, wie beim Vorbild. */
+.kb-spacer {
+    width: 16px;
+    height: 56px;
+}

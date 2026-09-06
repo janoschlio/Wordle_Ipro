@@ -1,0 +1,49 @@
+@* Gemeinsames Modal fuer Sieg und Niederlage. Die beiden Ausprägungen
+   unterscheiden sich nur in Beschriftung, Symbol und CSS-Modifier. *@
+
+@using BlazorServerApp.Models.Wordle
+
+@if (IsOpen)
+{
+    <div class="modal-overlay">
+        <div class="modal-card modal-@CssSuffix">
+            <div class="modal-icon-wrap">
+                <span class="material-symbols-outlined modal-icon">@Icon</span>
+            </div>
+
+            <div>
+                <h2 class="modal-title">@Title</h2>
+                <p class="modal-sub">@Subtitle</p>
+            </div>
+
+            <div class="modal-word">
+                @foreach (var ch in TargetWord)
+                {
+                    <div class="modal-tile">@ch</div>
+                }
+            </div>
+
+            <button class="modal-btn modal-btn-@CssSuffix" @onclick="OnAction">
+                @ButtonText
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>Sieg oder Niederlage; steuert Farbgebung ueber die CSS-Modifier.</summary>
+    [Parameter, EditorRequired] public ResultVariant Variant { get; set; }
+
+    /// <summary>Ergibt die CSS-Klassen modal-win/modal-lose bzw. modal-btn-win/-lose.</summary>
+    private string CssSuffix => Variant == ResultVariant.Win ? "win" : "lose";
+
+    [Parameter, EditorRequired] public string Icon { get; set; } = "";
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter, EditorRequired] public string Subtitle { get; set; } = "";
+    [Parameter, EditorRequired] public string ButtonText { get; set; } = "";
+
+    [Parameter] public bool IsOpen { get; set; }
+    /// <summary>Das gesuchte Wort, das im Modal aufgedeckt wird.</summary>
+    [Parameter] public string TargetWord { get; set; } = "";
+    [Parameter] public EventCallback OnAction { get; set; }
+}

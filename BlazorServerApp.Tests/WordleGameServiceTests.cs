@@ -134,7 +134,7 @@ public class WordleGameServiceTests
         // Assert
         Assert.True(spiel.IsGameWon);
         Assert.False(spiel.IsGameLost);
-        Assert.True(spiel.IsBlocked());
+        Assert.True(spiel.IsGameOver());
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class WordleGameServiceTests
         var spiel = new WordleGameService();
 
         // Act
-        for (var runde = 0; runde < 6; runde++)
+        for (var runde = 0; runde < WordleRules.MaxAttempts; runde++)
         {
             Tippe(spiel, FalscherVersuch);
             await spiel.SubmitGuessAsync();
@@ -153,7 +153,7 @@ public class WordleGameServiceTests
         // Assert
         Assert.True(spiel.IsGameLost);
         Assert.False(spiel.IsGameWon);
-        Assert.True(spiel.IsBlocked());
+        Assert.True(spiel.IsGameOver());
     }
 
     [Fact]
@@ -163,7 +163,7 @@ public class WordleGameServiceTests
         var spiel = new WordleGameService();
 
         // Act
-        for (var runde = 0; runde < 5; runde++)
+        for (var runde = 0; runde < WordleRules.MaxAttempts - 1; runde++)
         {
             Tippe(spiel, FalscherVersuch);
             await spiel.SubmitGuessAsync();
@@ -171,7 +171,7 @@ public class WordleGameServiceTests
 
         // Assert
         Assert.False(spiel.IsGameLost);
-        Assert.False(spiel.IsBlocked());
+        Assert.False(spiel.IsGameOver());
     }
 
     [Fact]
@@ -215,11 +215,42 @@ public class WordleGameServiceTests
         await spiel.SubmitGuessAsync();
 
         // Assert
-        var m = spiel.Keys.Single(k => k.Label == "M");
-        var s = spiel.Keys.Single(k => k.Label == "S");
+        var geratenerBuchstabe = spiel.Keys.Single(taste => taste.Label == "M");
+        var nichtGeratenerBuchstabe = spiel.Keys.Single(taste => taste.Label == "S");
 
-        Assert.Equal(KeyState.Absent, m.State);
-        Assert.Equal(KeyState.Neutral, s.State);
+        Assert.Equal(KeyState.Absent, geratenerBuchstabe.State);
+        Assert.Equal(KeyState.Neutral, nichtGeratenerBuchstabe.State);
+    }
+
+    [Fact]
+    public async Task Neue_Runde_setzt_die_Tastatur_zurueck()
+    {
+        // Arrange: nach MOTOR sind M, O, T und R grau
+        var spiel = new WordleGameService();
+        Tippe(spiel, "MOTOR");
+        await spiel.SubmitGuessAsync();
+
+        // Act
+        await spiel.ResetGameAsync();
+
+        // Assert: keine Taste traegt noch eine Bewertung aus der Vorrunde
+        Assert.All(spiel.Keys, taste => Assert.Equal(KeyState.Neutral, taste.State));
+    }
+
+    [Fact]
+    public async Task Nach_neuer_Runde_sind_gesperrte_Buchstaben_wieder_eingebbar()
+    {
+        // Arrange: M ist nach MOTOR gesperrt
+        var spiel = new WordleGameService();
+        Tippe(spiel, "MOTOR");
+        await spiel.SubmitGuessAsync();
+        await spiel.ResetGameAsync();
+
+        // Act
+        spiel.AddLetter('M');
+
+        // Assert
+        Assert.Equal("M____", Zeile(spiel, 0));
     }
 
     [Fact]

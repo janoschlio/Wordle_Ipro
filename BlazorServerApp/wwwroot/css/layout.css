@@ -170,3 +170,16 @@
     letter-spacing: 0.05em;
     color: var(--text-muted);
 }
+
+/* Faengt die Tastatureingaben ab und ordnet Kopfzeile, Brett und Tastatur
+   untereinander an. Der Fokusrahmen entfaellt, da das div nur als
+   Eingabe-Empfaenger dient und nicht wie ein Bedienelement aussehen soll. */
+.key-capture {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    outline: none;
+}

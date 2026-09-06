@@ -1,19 +1,25 @@
 using BlazorServerApp.Data;
 using BlazorServerApp.Data.DTOs;
 using BlazorServerApp.Data.Models;
+using BlazorServerApp.Models.Wordle;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlazorServerApp.Services.Statistics;
 
+/// <summary>
+/// Wertet die gespeicherten Spielergebnisse eines Spielers aus.
+/// </summary>
 public class StatisticsService
 {
+    private const int RecentRoundsShown = 7;
+
     private readonly WordleDbContext _context;
 
     public StatisticsService(WordleDbContext context)
     {
         _context = context;
     }
-    
+
     public async Task SaveGameResultAsync(GameResult gameResult)
     {
         _context.GameResults.Add(gameResult);
@@ -22,95 +28,106 @@ public class StatisticsService
     
     public async Task<StatisticsDto> GetStatisticsAsync(string playerId)
     {
-        var allResults = await _context.GameResults
-            .Where(g => g.PlayerId == playerId)
-            .OrderBy(g => g.PlayedAt)
-            .ToListAsync();
-
-        var wonGames = allResults.Where(g => g.IsWon).ToList();
-
-        var stats = new StatisticsDto
-        {
-            GamesPlayed = allResults.Count,
-            AverageGuesses = wonGames.Any()
-                ? wonGames.Average(g => g.GuessCount)
-                : 0,
-            GuessDistribution = CalculateGuessDistribution(wonGames),
-            RecentResults = await GetRecentPerformanceAsync(playerId, 7)
-        };
-
-        // Calculate current and max streaks
-        var (currentStreak, maxStreak) = CalculateStreaks(allResults);
-        stats.CurrentStreak = currentStreak;
-        stats.MaxStreak = maxStreak;
-
-        return stats;
-    }
-    
-    private async Task<List<GameResultDto>> GetRecentPerformanceAsync(string playerId, int count)
-    {
-        return await _context.GameResults
-            .Where(g => g.PlayerId == playerId)
-            .OrderByDescending(g => g.PlayedAt)
-            .Take(count)
-            .Select(g => new GameResultDto
+        // Aufsteigend nach Zeit: die Serienberechnung setzt diese Reihenfolge voraus.
+        var allGames = await _context.GameResults
+            .Where(game => game.PlayerId == playerId)
+            .OrderBy(game => game.PlayedAt)
+            .Select(game => new GameResultDto
             {
-                IsWon = g.IsWon,
-                GuessCount = g.GuessCount,
-                PlayedAt = g.PlayedAt
+                IsWon = game.IsWon,
+                GuessCount = game.GuessCount,
+                PlayedAt = game.PlayedAt
             })
             .ToListAsync();
+
+        var wonGames = allGames.Where(game => game.IsWon).ToList();
+
+        var averageGuesses = CalculateAverageGuesses(wonGames);
+        var (currentStreak, maxStreak) = CalculateStreaks(allGames);
+
+        return new StatisticsDto
+        {
+            GamesPlayed = allGames.Count,
+            AverageGuesses = averageGuesses,
+            GuessDistribution = CalculateGuessDistribution(wonGames),
+            RecentResults = GetRecentGames(allGames),
+            CurrentStreak = currentStreak,
+            MaxStreak = maxStreak
+        };
     }
     
-    private Dictionary<int, int> CalculateGuessDistribution(List<GameResult> wonGames)
+    private static double CalculateAverageGuesses(List<GameResultDto> wonGames)
+    {
+        if (wonGames.Count == 0)
+        {
+            return 0;
+        }
+
+        return wonGames.Average(game => game.GuessCount);
+    }
+    
+    private static List<GameResultDto> GetRecentGames(List<GameResultDto> allGames)
+    {
+        var newestFirst = new List<GameResultDto>();
+
+        // Von hinten nach vorne: das zuletzt gespielte Spiel steht am Listenende.
+        for (var i = allGames.Count - 1; i >= 0; i--)
+        {
+            if (newestFirst.Count == RecentRoundsShown)
+            {
+                break;
+            }
+
+            newestFirst.Add(allGames[i]);
+        }
+
+        return newestFirst;
+    }
+    
+    private static Dictionary<int, int> CalculateGuessDistribution(List<GameResultDto> wonGames)
     {
         var distribution = new Dictionary<int, int>();
 
-        // Initialize all possible guess counts (1-6)
-        for (int i = 1; i <= 6; i++)
+        for (var attempts = 1; attempts <= WordleRules.MaxAttempts; attempts++)
         {
-            distribution[i] = 0;
-        }
-
-        // Count wins by guess count
-        foreach (var game in wonGames)
-        {
-            if (game.GuessCount >= 1 && game.GuessCount <= 6)
-            {
-                distribution[game.GuessCount]++;
-            }
+            distribution[attempts] = wonGames.Count(game => game.GuessCount == attempts);
         }
 
         return distribution;
     }
     
-    private (int currentStreak, int maxStreak) CalculateStreaks(List<GameResult> results)
+    private static (int Current, int Max) CalculateStreaks(List<GameResultDto> games)
     {
-        if (!results.Any())
-            return (0, 0);
+        var streak = 0;
+        var maxStreak = 0;
 
-        int currentStreak = 0;
-        int maxStreak = 0;
-        int tempStreak = 0;
-
-        // Iterate from oldest to newest
-        foreach (var result in results)
+        foreach (var game in games)
         {
-            if (result.IsWon)
+            if (game.IsWon)
             {
-                tempStreak++;
-                maxStreak = Math.Max(maxStreak, tempStreak);
+                streak++;
             }
             else
             {
-                tempStreak = 0;
+                streak = 0;
             }
+
+            maxStreak = Math.Max(maxStreak, streak);
         }
 
-        // Current streak is only valid if the last game was won
-        if (results.Last().IsWon)
+        // Die laufende Serie zählt nur, solange die letzte Runde gewonnen wurde.
+        // Nach einer Niederlage steht streak ohnehin auf 0, aber der ausdrückliche
+        // Fall macht die Regel beim Lesen sichtbar.
+        var currentStreak = 0;
+
+        if (games.Count > 0)
         {
-            currentStreak = tempStreak;
+            var lastGame = games[games.Count - 1];
+
+            if (lastGame.IsWon)
+            {
+                currentStreak = streak;
+            }
         }
 
         return (currentStreak, maxStreak);

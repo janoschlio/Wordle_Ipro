@@ -28,7 +28,7 @@ public class GuessEvaluationTests
         const string versuch = "SPIEL";
 
         // Act
-        var ergebnis = WordleGameService.EvaluateGuess(versuch, ziel);
+        var ergebnis = WordleGameService.EvaluateGuess(guess: versuch, target: ziel);
 
         // Assert
         Assert.Equal("GGGGG", Muster(ergebnis));
@@ -42,7 +42,7 @@ public class GuessEvaluationTests
         const string versuch = "MOTOR";
 
         // Act
-        var ergebnis = WordleGameService.EvaluateGuess(versuch, ziel);
+        var ergebnis = WordleGameService.EvaluateGuess(guess: versuch, target: ziel);
 
         // Assert
         Assert.Equal("-----", Muster(ergebnis));
@@ -56,7 +56,7 @@ public class GuessEvaluationTests
         const string versuch = "PILZE";
 
         // Act
-        var ergebnis = WordleGameService.EvaluateGuess(versuch, ziel);
+        var ergebnis = WordleGameService.EvaluateGuess(guess: versuch, target: ziel);
 
         // Assert
         Assert.Equal("YYY-Y", Muster(ergebnis));
@@ -70,7 +70,7 @@ public class GuessEvaluationTests
         const string versuch = "EBENE";
 
         // Act
-        var ergebnis = WordleGameService.EvaluateGuess(versuch, ziel);
+        var ergebnis = WordleGameService.EvaluateGuess(guess: versuch, target: ziel);
 
         // Assert: nur das korrekt platzierte E wird gruen, die anderen bleiben grau
         Assert.Equal("--GY-", Muster(ergebnis));
@@ -84,7 +84,7 @@ public class GuessEvaluationTests
         const string versuch = "EBENE";
 
         // Act
-        var ergebnis = WordleGameService.EvaluateGuess(versuch, ziel);
+        var ergebnis = WordleGameService.EvaluateGuess(guess: versuch, target: ziel);
 
         // Assert: das Kontingent geht an den exakten Treffer, nicht an das erste E
         Assert.Equal(TileState.Absent, ergebnis[0]);
@@ -99,7 +99,7 @@ public class GuessEvaluationTests
         const string versuch = "LILIE";
 
         // Act
-        var ergebnis = WordleGameService.EvaluateGuess(versuch, ziel);
+        var ergebnis = WordleGameService.EvaluateGuess(guess: versuch, target: ziel);
 
         // Assert: eines richtig platziert, eines an falscher Stelle
         Assert.Equal("Y-G-G", Muster(ergebnis));
@@ -113,7 +113,7 @@ public class GuessEvaluationTests
         const string versuch = "EIMER";
 
         // Act
-        var ergebnis = WordleGameService.EvaluateGuess(versuch, ziel);
+        var ergebnis = WordleGameService.EvaluateGuess(guess: versuch, target: ziel);
 
         // Assert
         Assert.Equal("Y--Y-", Muster(ergebnis));
@@ -129,7 +129,7 @@ public class GuessEvaluationTests
         // Arrange: Eingaben kommen aus den InlineData-Faellen
 
         // Act
-        var ergebnis = WordleGameService.EvaluateGuess(versuch, ziel);
+        var ergebnis = WordleGameService.EvaluateGuess(guess: versuch, target: ziel);
 
         // Assert
         Assert.Equal(erwartet, Muster(ergebnis));
@@ -143,9 +143,9 @@ public class GuessEvaluationTests
         const string versuch = "SPIEL";
 
         // Act
-        var ergebnis = WordleGameService.EvaluateGuess(versuch, ziel);
+        var ergebnis = WordleGameService.EvaluateGuess(guess: versuch, target: ziel);
 
         // Assert
-        Assert.Equal(WordListService.WordLength, ergebnis.Length);
+        Assert.Equal(WordleRules.WordLength, ergebnis.Length);
     }
 }

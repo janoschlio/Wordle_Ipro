@@ -1,8 +1,8 @@
 @page "/words"
 @using BlazorServerApp.Data.DTOs
+@using BlazorServerApp.Models.Wordle
 @using BlazorServerApp.Services.Wordle
 @inject WordListService WordListService
-@rendermode InteractiveServer
 
 <PageTitle>Wörter - Wordle Pro</PageTitle>
 
@@ -15,7 +15,7 @@
             </p>
         </div>
         <div class="words-count">
-            <span class="words-count-value">@_wordCount</span>
+            <span class="words-count-value">@_words.Count</span>
             <span class="words-count-label">Wörter</span>
         </div>
     </header>
@@ -25,7 +25,7 @@
         <p class="words-hint">
             Ein Wort pro Zeile &mdash; Kommas, Semikolons und Leerzeichen funktionieren
             ebenfalls als Trennzeichen. Zeilen, die mit <code>#</code> beginnen, werden
-            ignoriert. Jedes Wort muss genau @WordListService.WordLength Buchstaben von
+            ignoriert. Jedes Wort muss genau @WordleRules.WordLength Buchstaben von
             A&ndash;Z haben. Wörter mit Umlauten werden abgelehnt, da die
             Bildschirmtastatur keine Umlaut-Tasten hat.
         </p>
@@ -41,7 +41,7 @@
         <textarea class="words-textarea"
                   rows="10"
                   placeholder="@("APFEL\nBLUME\nKATZE")"
-                  @bind="_input"
+                  @bind="_wordListText"
                   @bind:event="oninput"></textarea>
 
         <div class="words-mode">
@@ -63,46 +63,42 @@
 
         <div class="words-actions">
             <button class="words-btn words-btn-primary"
-                    disabled="@(_isBusy || string.IsNullOrWhiteSpace(_input))"
-                    @onclick="ImportAsync">
-                @(_isBusy ? "Wird importiert..." : "Importieren")
+                    disabled="@(!CanImport)"
+                    @onclick="HandleImportClicked">
+                @(_isImporting ? "Wird importiert..." : "Importieren")
             </button>
             <button class="words-btn words-btn-ghost"
-                    disabled="@_isBusy"
+                    disabled="@_isImporting"
                     @onclick="ClearInput">
                 Leeren
             </button>
         </div>
 
-        @if (_error is not null)
+        @if (_errorMessage is not null)
         {
             <div class="words-result words-result-error">
                 <span class="material-symbols-outlined">error</span>
-                <span>@_error</span>
+                <span>@_errorMessage</span>
             </div>
         }
-        else if (_result is not null)
+        else if (_importResult is not null)
         {
             <div class="words-result words-result-success">
                 <span class="material-symbols-outlined">check_circle</span>
                 <div>
-                    <p class="words-result-main">
-                        @_result.Added @(_result.Added == 1 ? "Wort" : "Wörter")
-                        @(_result.Replaced ? "importiert (Liste ersetzt)" : "hinzugefügt")
-                        &mdash; insgesamt @_result.TotalAfterImport.
-                    </p>
-                    @if (_result.Duplicates > 0 || _result.Rejected > 0)
+                    <p class="words-result-main">@BuildResultMessage(_importResult)</p>
+                    @if (_importResult.Duplicates > 0 || _importResult.Rejected > 0)
                     {
                         <p class="words-result-detail">
-                            @if (_result.Duplicates > 0)
+                            @if (_importResult.Duplicates > 0)
                             {
-                                <span>@_result.Duplicates als Duplikate übersprungen. </span>
+                                <span>@_importResult.Duplicates als Duplikate übersprungen. </span>
                             }
-                            @if (_result.Rejected > 0)
+                            @if (_importResult.Rejected > 0)
                             {
                                 <span>
-                                    @_result.Rejected als ungültig abgelehnt
-                                    (z.B. @string.Join(", ", _result.RejectedSamples)).
+                                    @_importResult.Rejected als ungültig abgelehnt
+                                    (z.B. @string.Join(", ", _importResult.RejectedSamples)).
                                 </span>
                             }
                         </p>
@@ -135,18 +131,40 @@
 </div>
 
 @code {
-    private const long MaxUploadBytes = 1024 * 1024;
+    /// <summary>
+    /// Obergrenze fuer den Datei-Upload. Die Datei wird komplett in den
+    /// Speicher gelesen, deshalb ueberhaupt eine Grenze; 1 MB ist weit mehr,
+    /// als eine Wortliste je braucht.
+    /// </summary>
+    private const long MaxUploadKilobytes = 1024;
+
+    private const long MaxUploadBytes = MaxUploadKilobytes * 1024;
 
     private List<string> _words = [];
-    private int _wordCount;
 
-    private string _input = string.Empty;
+    private string _wordListText = string.Empty;
     private string? _fileName;
     private bool _replaceExisting;
-    private bool _isBusy;
+    private bool _isImporting;
 
-    private WordImportResultDto? _result;
-    private string? _error;
+    private WordImportResultDto? _importResult;
+    private string? _errorMessage;
+
+    /// <summary>Der Knopf bleibt gesperrt, solange nichts zu importieren ist.</summary>
+    private bool CanImport =>
+        !_isImporting && !string.IsNullOrWhiteSpace(_wordListText);
+
+    /// <summary>
+    /// Setzt die Rueckmeldung nach einem Import zusammen. Als Methode statt als
+    /// Kette von Ternaeren im Markup, damit die Faelle einzeln lesbar bleiben.
+    /// </summary>
+    private static string BuildResultMessage(WordImportResultDto result)
+    {
+        var wordOrWords = result.Added == 1 ? "Wort" : "Wörter";
+        var actionText = result.Replaced ? "importiert (Liste ersetzt)" : "hinzugefügt";
+
+        return $"{result.Added} {wordOrWords} {actionText} — insgesamt {result.TotalAfterImport}.";
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -156,19 +174,18 @@
     private async Task LoadWordsAsync()
     {
         _words = await WordListService.GetAllAsync();
-        _wordCount = _words.Count;
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        _result = null;
-        _error = null;
+        _importResult = null;
+        _errorMessage = null;
 
         var file = e.File;
 
         if (file.Size > MaxUploadBytes)
         {
-            _error = $"Die Datei ist zu gross (maximal {MaxUploadBytes / 1024} KB).";
+            _errorMessage = $"Die Datei ist zu gross (maximal {MaxUploadKilobytes} KB).";
             _fileName = null;
             return;
         }
@@ -178,41 +195,41 @@
             await using var stream = file.OpenReadStream(MaxUploadBytes);
             using var reader = new StreamReader(stream);
 
-            _input = await reader.ReadToEndAsync();
+            _wordListText = await reader.ReadToEndAsync();
             _fileName = file.Name;
         }
         catch (IOException ex)
         {
-            _error = $"Die Datei konnte nicht gelesen werden: {ex.Message}";
+            _errorMessage = $"Die Datei konnte nicht gelesen werden: {ex.Message}";
             _fileName = null;
         }
     }
 
-    private async Task ImportAsync()
+    private async Task HandleImportClicked()
     {
-        _isBusy = true;
-        _result = null;
-        _error = null;
+        _isImporting = true;
+        _importResult = null;
+        _errorMessage = null;
 
         try
         {
-            _result = await WordListService.ImportAsync(_input, _replaceExisting);
+            _importResult = await WordListService.ImportAsync(_wordListText, _replaceExisting);
             await LoadWordsAsync();
 
-            _input = string.Empty;
+            _wordListText = string.Empty;
             _fileName = null;
         }
         finally
         {
-            _isBusy = false;
+            _isImporting = false;
         }
     }
 
     private void ClearInput()
     {
-        _input = string.Empty;
+        _wordListText = string.Empty;
         _fileName = null;
-        _result = null;
-        _error = null;
+        _importResult = null;
+        _errorMessage = null;
     }
 }

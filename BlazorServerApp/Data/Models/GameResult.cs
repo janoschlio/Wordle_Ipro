@@ -13,23 +13,12 @@ public class GameResult
     /// </summary>
     public required string PlayerId { get; set; }
 
-    /// <summary>
-    /// The target word that was being guessed
-    /// </summary>
     public required string TargetWord { get; set; }
 
-    /// <summary>
-    /// Number of guesses used (1-6 for wins, 0 for losses)
-    /// </summary>
+    /// <summary>Anzahl benoetigter Versuche bei einem Sieg, 0 bei einer Niederlage.</summary>
     public int GuessCount { get; set; }
 
-    /// <summary>
-    /// Whether the game was won
-    /// </summary>
     public bool IsWon { get; set; }
 
-    /// <summary>
-    /// When the game was played
-    /// </summary>
     public DateTime PlayedAt { get; set; }
 }

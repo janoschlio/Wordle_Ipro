@@ -1,23 +1,23 @@
 @using BlazorServerApp.Models.Wordle
 
 <div class="kb-row">
-    @foreach (var key in Keys.Where(IsTopRow))
+    @foreach (var key in KeysInRow(0))
     {
         <WordleKey KeyModel="key" OnPressed="OnKeyPressed" />
     }
 </div>
 
 <div class="kb-row">
-    <div style="width:16px; height:56px;"></div>
-    @foreach (var key in Keys.Where(IsMiddleRow))
+    <div class="kb-spacer"></div>
+    @foreach (var key in KeysInRow(1))
     {
         <WordleKey KeyModel="key" OnPressed="OnKeyPressed" />
     }
-    <div style="width:16px; height:56px;"></div>
+    <div class="kb-spacer"></div>
 </div>
 
 <div class="kb-row">
-    @foreach (var key in Keys.Where(IsBottomRow))
+    @foreach (var key in KeysInRow(2))
     {
         <WordleKey KeyModel="key" OnPressed="OnKeyPressed" />
     }
@@ -27,7 +27,5 @@
     [Parameter, EditorRequired] public IReadOnlyList<KeyModel> Keys { get; set; } = Array.Empty<KeyModel>();
     [Parameter] public EventCallback<string> OnKeyPressed { get; set; }
 
-    private static bool IsTopRow(KeyModel k) => "QWERTYUIOP".Contains(k.Label);
-    private static bool IsMiddleRow(KeyModel k) => "ASDFGHJKL".Contains(k.Label);
-    private static bool IsBottomRow(KeyModel k) => k.Label is "Enter" or "Back" || "ZXCVBNM".Contains(k.Label);
+    private IEnumerable<KeyModel> KeysInRow(int row) => Keys.Where(k => k.Row == row);
 }
