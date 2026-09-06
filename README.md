@@ -142,9 +142,44 @@ Regeln für den Import:
 Nach dem Import meldet die Seite zurück, wie viele Wörter hinzugefügt,
 übersprungen und abgelehnt wurden — inklusive Beispielen für die abgelehnten.
 
+> **Die Liste ist gleichzeitig Lösungs- und Rateliste.** Ein Versuch wird nur
+> akzeptiert, wenn er darin steht — sonst erscheint ein Hinweis unter dem
+> Spielbrett und der Versuch wird nicht verbraucht. Das echte Wordle trennt
+> beides (wenige Lösungswörter, viele erlaubte Versuche); hier ist es bewusst
+> vereinfacht.
+
 > **Auf Render Free beachten:** Eine hochgeladene Liste liegt in der SQLite-Datei
 > und ist nach einem Neustart des Containers weg. Dauerhafte Änderungen gehören
 > deshalb in `words.txt` und werden mit dem nächsten Deployment ausgerollt.
+
+## 📊 Statistik pro Spieler
+
+Jeder Besucher sieht nur seine eigene Statistik. Dafür gibt es keine Anmeldung,
+sondern eine anonyme Kennung:
+
+1. Beim ersten Besuch erzeugt [`PlayerService`](./BlazorServerApp/Services/Player/PlayerService.cs)
+   eine GUID und legt sie über `ProtectedLocalStorage` im Browser ab.
+2. Jedes Spielergebnis wird mit dieser Kennung in der Spalte
+   `GameResults.PlayerId` gespeichert.
+3. Die Statistik-Seite fragt ausschliesslich Zeilen mit der eigenen Kennung ab
+   (Index auf `PlayerId` + `PlayedAt`).
+
+Ein privates Fenster oder ein anderer Browser hat keine Kennung und startet
+deshalb mit einer leeren Statistik — praktisch, um das Verhalten vorzuführen.
+
+**Warum `OnAfterRenderAsync` statt `OnInitializedAsync`:** Der Zugriff auf den
+localStorage läuft über JS-Interop. Während des Prerenderings gibt es noch kein
+JavaScript, ein Zugriff dort würde zur Laufzeit fehlschlagen. Deshalb wird die
+Kennung erst nach dem ersten Rendern gelesen und danach `StateHasChanged()`
+aufgerufen.
+
+**Grenzen:** Die Kennung liegt im Browser. Wer den localStorage löscht, einen
+anderen Browser nimmt oder das Gerät wechselt, bekommt eine neue Kennung und
+damit eine leere Statistik. `ProtectedLocalStorage` verschlüsselt den Wert mit
+den Data-Protection-Schlüsseln des Servers; auf Render Free liegen diese im
+Container und sind nach einem Neustart weg — dann gibt es ebenfalls neue
+Kennungen. Da die SQLite-Datei beim Neustart ohnehin neu entsteht, fällt beides
+zusammen.
 
 ## 🎨 Design (Hell/Dunkel)
 

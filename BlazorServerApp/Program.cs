@@ -1,6 +1,7 @@
 using System.Globalization;
 using BlazorServerApp.Components;
 using BlazorServerApp.Data;
+using BlazorServerApp.Services.Player;
 using BlazorServerApp.Services.Statistics;
 using BlazorServerApp.Services.Wordle;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -34,6 +35,7 @@ builder.Services.AddDbContext<WordleDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("WordleDb")));
 
 // Register Services
+builder.Services.AddScoped<PlayerService>();
 builder.Services.AddScoped<StatisticsService>();
 builder.Services.AddScoped<WordListService>();
 builder.Services.AddScoped<WordleGameService>();

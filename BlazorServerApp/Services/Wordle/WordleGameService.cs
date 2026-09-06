@@ -1,5 +1,6 @@
 using BlazorServerApp.Data.Models;
 using BlazorServerApp.Models.Wordle;
+using BlazorServerApp.Services.Player;
 using BlazorServerApp.Services.Statistics;
 
 namespace BlazorServerApp.Services.Wordle;
@@ -13,6 +14,7 @@ public class WordleGameService
 
     private readonly StatisticsService? _statisticsService;
     private readonly WordListService? _wordListService;
+    private readonly PlayerService? _playerService;
 
     public string TargetWord { get; private set; } = FallbackWord;
 
@@ -31,10 +33,12 @@ public class WordleGameService
 
     public WordleGameService(
         StatisticsService? statisticsService = null,
-        WordListService? wordListService = null)
+        WordListService? wordListService = null,
+        PlayerService? playerService = null)
     {
         _statisticsService = statisticsService;
         _wordListService = wordListService;
+        _playerService = playerService;
         ResetBoard();
     }
     
@@ -250,11 +254,14 @@ public class WordleGameService
     
     private async Task SaveGameResultAsync()
     {
-        if (_statisticsService == null)
+        // Ohne Spieler-Kennung liesse sich das Ergebnis keiner Statistik
+        // zuordnen, dann wird es gar nicht erst gespeichert.
+        if (_statisticsService is null || _playerService is null)
             return;
 
         var gameResult = new GameResult
         {
+            PlayerId = await _playerService.EnsurePlayerIdAsync(),
             TargetWord = TargetWord,
             GuessCount = IsGameWon ? _currentRow + 1 : 0,
             IsWon = IsGameWon,

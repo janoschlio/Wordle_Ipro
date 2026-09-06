@@ -31,9 +31,12 @@ public class WordleDbContext : DbContext
         modelBuilder.Entity<GameResult>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.PlayerId).IsRequired().HasMaxLength(64);
             entity.Property(e => e.TargetWord).IsRequired().HasMaxLength(50);
             entity.Property(e => e.PlayedAt).IsRequired();
-            entity.HasIndex(e => e.PlayedAt);
+
+            // Jede Statistik-Abfrage filtert nach Spieler und sortiert nach Zeit.
+            entity.HasIndex(e => new { e.PlayerId, e.PlayedAt });
         });
     }
 }

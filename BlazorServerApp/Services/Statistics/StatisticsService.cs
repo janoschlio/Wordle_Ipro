@@ -20,9 +20,10 @@ public class StatisticsService
         await _context.SaveChangesAsync();
     }
     
-    public async Task<StatisticsDto> GetStatisticsAsync()
+    public async Task<StatisticsDto> GetStatisticsAsync(string playerId)
     {
         var allResults = await _context.GameResults
+            .Where(g => g.PlayerId == playerId)
             .OrderBy(g => g.PlayedAt)
             .ToListAsync();
 
@@ -35,7 +36,7 @@ public class StatisticsService
                 ? wonGames.Average(g => g.GuessCount)
                 : 0,
             GuessDistribution = CalculateGuessDistribution(wonGames),
-            RecentResults = await GetRecentPerformanceAsync(7)
+            RecentResults = await GetRecentPerformanceAsync(playerId, 7)
         };
 
         // Calculate current and max streaks
@@ -46,9 +47,10 @@ public class StatisticsService
         return stats;
     }
     
-    private async Task<List<GameResultDto>> GetRecentPerformanceAsync(int count)
+    private async Task<List<GameResultDto>> GetRecentPerformanceAsync(string playerId, int count)
     {
         return await _context.GameResults
+            .Where(g => g.PlayerId == playerId)
             .OrderByDescending(g => g.PlayedAt)
             .Take(count)
             .Select(g => new GameResultDto

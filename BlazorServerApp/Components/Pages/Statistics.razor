@@ -2,7 +2,9 @@
 @using BlazorServerApp.Services.Statistics
 @using BlazorServerApp.Data.DTOs
 @using BlazorServerApp.Components.Statistics
+@using BlazorServerApp.Services.Player
 @inject StatisticsService StatisticsService
+@inject PlayerService PlayerService
 @rendermode InteractiveServer
 
 <PageTitle>Statistik - Wordle Pro</PageTitle>
@@ -94,9 +96,17 @@
 @code {
     private StatisticsDto? _statistics;
 
-    protected override async Task OnInitializedAsync()
+    // Die Spieler-Kennung liegt im localStorage und ist deshalb erst nach dem
+    // ersten Rendern lesbar -- waehrend des Prerenderings gibt es kein JS.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _statistics = await StatisticsService.GetStatisticsAsync();
+        if (!firstRender)
+            return;
+
+        var playerId = await PlayerService.EnsurePlayerIdAsync();
+        _statistics = await StatisticsService.GetStatisticsAsync(playerId);
+
+        StateHasChanged();
     }
 
 }
